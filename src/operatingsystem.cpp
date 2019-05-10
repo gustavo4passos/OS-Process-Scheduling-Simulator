@@ -85,7 +85,7 @@ void OperatingSystem::Reset()
     // Put finished proccesses back in
     // waiting list.
     for(auto p = m_finishedProccesses.begin();
-        p != m_finishedProccesses.end())
+        p != m_finishedProccesses.end();)
     {
         m_proccesses.push_back(*p);
         m_finishedProccesses.erase(p);

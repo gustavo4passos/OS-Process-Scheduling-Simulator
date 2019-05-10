@@ -262,7 +262,7 @@ void Scheduler::MoveShortestJobToTheFront(std::vector<Proccess*>* executionQueue
     {
         Proccess* shortestJob = executionQueue->front();
         std::vector<Proccess*>::iterator shortestJobIt = executionQueue->begin();
-        int shortestJobDuration = shortestJob->GetDuration();
+        unsigned shortestJobDuration = shortestJob->GetDuration();
 
         for(auto p = executionQueue->begin();
             p != executionQueue->end();
@@ -317,7 +317,7 @@ void Scheduler::MoveProccessWithEarliestDeadline(std::vector<Proccess*>* executi
     {
         Proccess* earliestDeadlProcc = executionQueue->front();
         std::vector<Proccess*>::iterator earliestDeadlProccIt = executionQueue->begin();
-        int earliestDeadline = earliestDeadlProcc->GetDeadline();
+        unsigned earliestDeadline = earliestDeadlProcc->GetDeadline();
 
         for(auto p = executionQueue->begin();
             p != executionQueue->end();
