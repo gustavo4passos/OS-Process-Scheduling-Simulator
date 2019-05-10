@@ -5,7 +5,7 @@ enum class ProccessState
 {
   IDLE,
   RUNNING,
-  OVERLOAD,
+  OVERHEAD,
   DONE
 };
 

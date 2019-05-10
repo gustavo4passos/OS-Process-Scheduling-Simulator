@@ -6,15 +6,13 @@
 
 OperatingSystem::OperatingSystem(
     int quantum,
-    int overload,
+    int overhead,
     SchedulingAlgorithm schedulingAlgorithm)
 :   m_quantum(quantum),
-    m_overload(overload),
+    m_overhead(overhead),
     m_time(0),
-    m_currentProccessTimeLeft(0)
 {
-    m_scheduler = new Scheduler(quantum, overload, schedulingAlgorithm);
-
+    m_scheduler = new Scheduler(quantum, overhead, schedulingAlgorithm);
 }
 
 float OperatingSystem::GetAverageTurnaround() const
@@ -37,12 +35,15 @@ float OperatingSystem::GetAverageTurnaround() const
 
 void OperatingSystem::AddProccess(Proccess* proccess)
 {
-    if(proccess != nullptr) m_proccesses.push_back(proccess);
+    if(proccess != nullptr) 
+    {
+        m_proccesses.push_back(proccess);
+        m_numberOfProccesses++;
+    }
 }
 
 bool OperatingSystem::NextStep()
 {
-
     // If there are no proccesses in execution
     // and no proccesses to arrive
     // there is nothing to be done.
@@ -54,64 +55,15 @@ bool OperatingSystem::NextStep()
     // Advances time
     m_time++;    
 
-    // There are proccess active at the moment
+    // There are proccesses active at the moment
     // Note(Gustavo): This verification is needed
     // because it's possible that the execution queue
     // is empty (no active proccesses at the moment),
     // but proccesses will arrive later.
     if(m_executionQueue.size() > 0)
     {
-        // The current running procces has finished, so
-        // it must be removed from the execution queue (no overload)
-        if(m_executionQueue.front()->GetState() == ProccessState::DONE)
-        {
-            std::cout << "Proccess " << m_executionQueue.front()->GetID() << " is done." << std::endl;
-            m_finishedProccesses.push_back(m_executionQueue.front());
-            m_executionQueue.erase(m_executionQueue.begin());
-            m_scheduler->Run(&m_executionQueue);
-            m_currentProccessTimeLeft = m_quantum;
-
-            if(m_executionQueue.size() > 0)
-            {
-                m_executionQueue.front()->SetState(ProccessState::RUNNING);
-            }
-        }
-
-        // The current running procces has used all
-        // its available quantum
-        if(m_currentProccessTimeLeft == 0)
-        {
-            Proccess* currentRunningProccess = m_executionQueue.front();
-            currentRunningProccess->SetState(ProccessState::IDLE);
-
-            m_scheduler->Run(&m_executionQueue);
-            
-            // The current proccess has changed,
-            // so the OS needs to store the previous
-            // proccess state (overload)
-            if(currentRunningProccess->GetID() != m_executionQueue.front()->GetID())
-            {
-                currentRunningProccess->SetState(ProccessState::OVERLOAD);   
-                m_currentProccessOverloadLeft = m_overload;
-            }
-            else 
-            {
-                currentRunningProccess->SetState(ProccessState::RUNNING);
-            }
-            m_currentProccessTimeLeft = m_quantum;
-        }
-
-        if(m_executionQueue.front()->GetState() == ProccessState::OVERLOAD)
-        {
-            if(m_currentProccessOverloadLeft > 0) m_currentProccessOverloadLeft--;
-            else m_executionQueue.front()->SetState(ProccessState::RUNNING);
-        }
-
-        if(m_executionQueue.front()->GetState() == ProccessState::RUNNING)
-        {
-            m_executionQueue.front()->Run(m_time);
-            m_currentProccessTimeLeft--;
-        }
+        m_scheduler->Run(&m_executionQueue, &m_finishedProccesses, m_time);
+        if(m_executionQueue.size() > 0) m_executionQueue.front()->Run(m_time);
     }     
 
     return true;

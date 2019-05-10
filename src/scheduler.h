@@ -1,3 +1,9 @@
+/* Universidade Federal da Bahia         */
+/* Simulador de Escalonador de Processos */
+/* Gustavo Passos                        */
+/* Ana Clara Batista                     */
+/* Joao Victor                           */
+
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
@@ -17,28 +23,58 @@ class Scheduler
 {
 public:
     Scheduler(
-        int quantum, 
-        int overload, 
+        unsigned quantum, 
+        unsigned overhead, 
         SchedulingAlgorithm algorithm
-    ) { }
+    );
 
-    inline int Quantum()  { return m_quantum;  }
-    inline int Overload() { return m_overload; }
+    inline unsigned GetQuantum()  const { return m_quantum;  }
+    inline unsigned GetOverhead() const { return m_overhead; }
 
-    void Run(std::vector<Proccess*>* executionQueue);
-    void SetSchedulingAlgorithm(SchedulingAlgorithm shedulingAlgorithm) { }
+    void Run(
+        std::vector<Proccess*>* executionQueue,
+        std::vector<Proccess*>* finishedProccesses,
+        int currentTime);
+    void SetSchedulingAlgorithm(SchedulingAlgorithm shedulingAlgorithm);
 
 private:
-    int m_quantum;
-    int m_overload;
+    unsigned m_quantum;
+    unsigned m_overhead;
     SchedulingAlgorithm m_algorithm;
 
-    // The FIFO algorithm assumes that execution queue is alread
+    unsigned m_currentProccessTimeLeft;
+    unsigned m_overheadTimeLeft;;
+
+    // The FIFO algorithm assumes that execution queue is already
     // ordered by arrival time.
-    void RunFIFO(std::vector<Proccess*>* executionQueue);
-    void RunSJF(std::vector<Proccess*>* executionQueue);
-    void RunRoundRobin(std::vector<Proccess*>* executionQueue);
-    void RunEDF(std::vector<Proccess*>* executionQueue);
+    void RunFIFO(
+        std::vector<Proccess*>* executionQueue,
+        std::vector<Proccess*>* finishedProccesses, 
+        int currentTime
+        );
+    void RunSJF(
+        std::vector<Proccess*>* executionQueue,
+        std::vector<Proccess*>* finishedProccesses, 
+        int currentTime
+        );
+    void RunRoundRobin(
+        std::vector<Proccess*>* executionQueue,
+        std::vector<Proccess*>* finishedProccesses, 
+        int currentTime
+        );
+    void RunEDF(
+        std::vector<Proccess*>* executionQueue,
+        std::vector<Proccess*>* finishedProccesses, 
+        int currentTime
+        );
+
+    void MoveShortestJobToTheFront(std::vector<Proccess*>* executionQueue);
+    void MoveCurrentProccessToFinishedList(
+        std::vector<Proccess*>* executionQueue,
+        std::vector<Proccess*>* finishedProccesses
+        );
+    void MoveCurrentProccessToEndOfQueue(std::vector<Proccess*>* executionQueue);
+    void MoveProccessWithEarliestDeadline(std::vector<Proccess*>* executionQueue);
 };
 
 #endif

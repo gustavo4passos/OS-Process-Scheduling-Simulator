@@ -15,12 +15,14 @@ class OperatingSystem
 public:
     OperatingSystem(
         int quantum, 
-        int overload, 
+        int overhead, 
         SchedulingAlgorithm schedulingAlgorithm
     );
 
-    inline unsigned int GetQuantum() const { return m_quantum; }
-    inline unsigned int GetOverload() const { return m_overload; }
+    inline unsigned int GetQuantum()        const { return m_quantum; }
+    inline unsigned int GetOverhead()       const { return m_overhead; }
+    inline unsigned GetNumberOfProccesses() const { m_numberOfProccesses; }
+
     float GetAverageTurnaround() const;
 
     const std::vector<Proccess*>& GetFinishedProccesses() const { return m_finishedProccesses; }
@@ -35,13 +37,12 @@ public:
 
 private:
     unsigned int m_quantum;
-    unsigned int m_overload;
+    unsigned int m_overhead;
     Scheduler* m_scheduler;
     Memory* m_virtualMemory;
     Memory* m_RAMMemory;
     unsigned int m_time;
-    int m_currentProccessTimeLeft;
-    int m_currentProccessOverloadLeft;
+    unsigned m_numberOfProccesses;
 
     std::vector<Proccess*> m_executionQueue;
     std::vector<Proccess*> m_proccesses;

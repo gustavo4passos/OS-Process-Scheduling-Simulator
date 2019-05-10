@@ -6,10 +6,10 @@
 
 int main(int argc, char* args[])
 {
-    OperatingSystem operatingSystem = OperatingSystem(2, 2, SchedulingAlgorithm::FIFO);
-    Proccess* p1 = new Proccess(1, 0, 3, 4, 1);
-    Proccess* p2 = new Proccess(2, 1, 2, 4, 2);
-    Proccess* p3 = new Proccess(3, 20, 2, 4, 2);
+    OperatingSystem operatingSystem = OperatingSystem(3, 1, SchedulingAlgorithm::EDF);
+    Proccess* p1 = new Proccess(1, 0, 5, 4, 1);
+    Proccess* p2 = new Proccess(2, 0, 7, 4, 2);
+    Proccess* p3 = new Proccess(3, 8, 10, 4, 2);
 
     operatingSystem.AddProccess(p1);
     operatingSystem.AddProccess(p2);

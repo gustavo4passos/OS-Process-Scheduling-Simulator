@@ -24,6 +24,11 @@ void Proccess::Run(int currentTime)
     {
         m_state = ProccessState::RUNNING;
     }
+    if(m_state == ProccessState::OVERHEAD)
+    {
+        std::cout << "Overhead of proccess " << m_ID << std::endl;
+        return;
+    }
 
     m_timeLeft--;
 
