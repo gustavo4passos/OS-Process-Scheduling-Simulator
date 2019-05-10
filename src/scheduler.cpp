@@ -40,6 +40,26 @@ void Scheduler::Run(
     }
 }
 
+void Scheduler::Reset()
+{
+    m_currentProccessTimeLeft = 0;
+    m_overheadTimeLeft = 0;
+}
+
+void Scheduler::SetSchedulingAlgorithm(
+    SchedulingAlgorithm algorithm,
+    std::vector<Proccess*>* executionQueue)
+{
+    m_currentProccessTimeLeft = 0;
+    m_overheadTimeLeft = 0;
+    m_algorithm = algorithm;
+
+    for(auto p = executionQueue->begin(); p != executionQueue->end(); p++)
+    {
+        (*p)->SetState(ProccessState::IDLE);
+    }
+}
+
 void Scheduler::RunFIFO(
     std::vector<Proccess*>* executionQueue,
     std::vector<Proccess*>* finishedProccesses, 

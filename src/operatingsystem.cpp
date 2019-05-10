@@ -10,7 +10,7 @@ OperatingSystem::OperatingSystem(
     SchedulingAlgorithm schedulingAlgorithm)
 :   m_quantum(quantum),
     m_overhead(overhead),
-    m_time(0),
+    m_time(0)
 {
     m_scheduler = new Scheduler(quantum, overhead, schedulingAlgorithm);
 }
@@ -67,6 +67,37 @@ bool OperatingSystem::NextStep()
     }     
 
     return true;
+}
+
+void OperatingSystem::Reset()
+{
+    m_scheduler->Reset();
+
+    // Put current running proccesses 
+    // back in waiting list.
+    for(auto p = m_executionQueue.begin();
+        p != m_executionQueue.end();)
+    {
+        m_proccesses.push_back(*p);
+        m_executionQueue.erase(p);
+    }
+
+    // Put finished proccesses back in
+    // waiting list.
+    for(auto p = m_finishedProccesses.begin();
+        p != m_finishedProccesses.end())
+    {
+        m_proccesses.push_back(*p);
+        m_finishedProccesses.erase(p);
+    }
+
+    // Reset all proccesses
+    for(auto p = m_proccesses.begin();
+        p != m_proccesses.end();
+        p++)
+    {
+        (*p)->Reset();
+    }
 }
 
 void OperatingSystem::UpdateExecutionQueue()

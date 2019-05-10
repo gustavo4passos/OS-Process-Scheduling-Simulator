@@ -35,7 +35,17 @@ public:
         std::vector<Proccess*>* executionQueue,
         std::vector<Proccess*>* finishedProccesses,
         int currentTime);
-    void SetSchedulingAlgorithm(SchedulingAlgorithm shedulingAlgorithm);
+
+    // Reset timers
+    void Reset();
+    
+    // Changes the current scheduling algoritm.
+    // Attention: All the proccesses in the execution queue
+    // will be set to idle.
+    void SetSchedulingAlgorithm(
+        SchedulingAlgorithm shedulingAlgorithm,
+        std::vector<Proccess*>* executionQueue
+        );
 
 private:
     unsigned m_quantum;

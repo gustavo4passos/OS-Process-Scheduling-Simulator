@@ -2,18 +2,20 @@
 #include <iostream>
 
 Proccess::Proccess(
-    int ID, 
-    int arrivalTime,
-    int duration,
-    int deadline,
-    int priority)
+    unsigned ID, 
+    unsigned arrivalTime,
+    unsigned duration,
+    unsigned deadline,
+    unsigned priority)
 :   m_ID(ID),
     m_arrivalTime(arrivalTime),
     m_duration(duration),
     m_timeLeft(duration),
     m_deadline(deadline),
     m_priority(priority),
-    m_state(ProccessState::IDLE)
+    m_state(ProccessState::IDLE),
+    m_finished(false),
+    m_finishTime(0)
 { }
 
 void Proccess::Run(int currentTime)
@@ -42,4 +44,12 @@ void Proccess::Run(int currentTime)
     }
     
     std::cout << "Running proccess " << m_ID << " time left " << m_timeLeft << std::endl;
+}
+
+void Proccess::Reset()
+{
+    m_timeLeft = m_duration;
+    m_state = ProccessState::IDLE;
+    m_finished = false;
+    m_finishTime = 0;
 }

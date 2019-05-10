@@ -13,21 +13,24 @@ class Proccess
 {
 public:
     Proccess(
-        int ID,
-        int arrivalTime,
-        int duration,
-        int deadline,
-        int priority
+        unsigned ID,
+        unsigned arrivalTime,
+        unsigned duration,
+        unsigned deadline,
+        unsigned priority
     );
 
-    inline int GetID()          const { return m_ID;          }
-    inline int GetArrivalTime() const { return m_arrivalTime; }
-    inline int GetDuration()    const { return m_duration;    }
-    inline int GetTimeLeft()    const { return m_timeLeft;    }
-    inline int GetDeadline()    const { return m_deadline;    }
-    inline int GetPriority()    const { return m_priority;    }
-    inline int GetFinishTime()  const { return m_finishTime;  }
-    inline bool IsFinished()    const { return m_finished;    }
+    inline unsigned GetID()          const { return m_ID;          }
+    inline unsigned GetArrivalTime() const { return m_arrivalTime; }
+    inline unsigned GetDuration()    const { return m_duration;    }
+    inline unsigned GetTimeLeft()    const { return m_timeLeft;    }
+    inline unsigned GetDeadline()    const { return m_deadline;    }
+    inline unsigned GetPriority()    const { return m_priority;    }
+    // Returns when the proccess finished.
+    // If the proccess has not yet finished,
+    // it returns 0.
+    inline unsigned GetFinishTime()  const { return m_finishTime;  }
+    inline bool IsFinished()         const { return m_finished;    }
 
     inline int GetTurnAround()  const { return m_finishTime - m_arrivalTime; }
     inline ProccessState GetState() const { return m_state; }
@@ -35,21 +38,23 @@ public:
     inline void SetFinishTime(int time) { m_finishTime = time; }
 
     void Run(int currentTime);
+    // Reset procccess to its initial state
+    void Reset();
 
 
     // Sort proccess based on arrival time
     bool operator< (const Proccess& p) { return m_arrivalTime < p.m_arrivalTime; }
 
 private:
-    int m_ID;
-    int m_arrivalTime;
-    int m_duration;
-    int m_timeLeft;
-    int m_deadline;
-    int m_priority;
+    unsigned m_ID;
+    unsigned m_arrivalTime;
+    unsigned m_duration;
+    unsigned m_timeLeft;
+    unsigned m_deadline;
+    unsigned m_priority;
     ProccessState m_state;
     bool m_finished;
-    int m_finishTime;
+    unsigned m_finishTime;
 };
 
 #endif
