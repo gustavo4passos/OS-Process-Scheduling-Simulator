@@ -22,7 +22,8 @@ AddProccessWidget::AddProccessWidget(int proccessIndex, QWidget* parent)
     m_arrivalTimeInput->setStatusTip(tr("Set the arrival time of the proccess."));
 
     QPushButton* removeButton = new QPushButton(tr("Remove"), nullptr);
-    connect(removeButton, &QPushButton::clicked, this, AddProccessWidget::close);
+    connect(removeButton, &QPushButton::clicked, 
+        this, &AddProccessWidget::RemoveButtonClicked);
 
     m_proccessLayout->addWidget(m_priorityLabel, 0, 0);
     m_proccessLayout->addWidget(m_priorityInput, 0, 1);
@@ -30,12 +31,18 @@ AddProccessWidget::AddProccessWidget(int proccessIndex, QWidget* parent)
     m_proccessLayout->addWidget(m_durationInput, 1, 1);
     m_proccessLayout->addWidget(m_arrivalTimeLabel, 2, 0);
     m_proccessLayout->addWidget(m_arrivalTimeInput, 2, 1);
-    m_proccessLayout->addWidget(removeButton, 3, 0, Qt::AlignCenter);
+    m_proccessLayout->addWidget(removeButton, 3, 1, Qt::AlignRight);
 
+    setFixedSize(150, 150);
     setLayout(m_proccessLayout);
 }
 
 int AddProccessWidget::GetArrivalTime()
 {
     return m_arrivalTimeInput->value();
+}
+
+void AddProccessWidget::RemoveButtonClicked()
+{
+    emit RemoveProccessRequested(this);
 }

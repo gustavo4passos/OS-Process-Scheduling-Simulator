@@ -12,6 +12,12 @@ public:
     // Retrieves current value of arrival time
     int GetArrivalTime();
 
+private slots:
+    void RemoveButtonClicked();
+
+signals:
+    void RemoveProccessRequested(QWidget* proccess);
+
 private:
     QGridLayout* m_proccessLayout;
     QLabel* m_priorityLabel;

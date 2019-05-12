@@ -3,6 +3,8 @@
 
 #include <QtWidgets\QtWidgets>
 
+class ProccessList;
+
 class MainWindow : public QMainWindow
 {
         Q_OBJECT
@@ -11,6 +13,7 @@ public:
 
 private slots:
     void AddProccessBox();
+    void ActivateOrDeactivateRunButton(int numberOfProccesses);
     void Load();
 
 private:
@@ -23,17 +26,24 @@ private:
     void ConnectWidgets();
 
     QWidget* m_mainWidget;
-    QBoxLayout* m_mainLayout;
+
+    QVBoxLayout* m_mainGrid;
+    QVBoxLayout* m_mainLayout;
+
+    QGroupBox* m_osSettingsGroup;
     QMenu* m_fileMenu;
-    QPushButton* m_addProccessButon;
     QAction* m_loadAction;
 
     QGroupBox* m_schedulingAlgorithmBox;
+    QBoxLayout* m_schedulerSettingsLayout;
     QHBoxLayout* m_schedulingOptionsLayout;
     QButtonGroup* m_schedulingRadioButtons;
-
     QGroupBox* m_quantumValueSelectorBox;
     QSpinBox* m_quantumValueSelector;
+
+    QWidget* m_prccessListGroup;
+    ProccessList* m_proccessList;
+    QPushButton* m_addProccessButton;
 
     QPushButton* m_runButton;
     int m_numberOfProccesses;

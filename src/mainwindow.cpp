@@ -1,17 +1,18 @@
 #include "mainwindow.h"
 #include "addproccesswidget.h"
+#include "proccesslist.h"
 
 MainWindow::MainWindow()
-:   m_mainWidget(nullptr),
-    m_mainLayout(nullptr),
+:   m_schedulerSettingsLayout(nullptr),
     m_fileMenu(nullptr),
-    m_addProccessButon(nullptr),
+    m_addProccessButton(nullptr),
     m_loadAction(nullptr),
     m_schedulingAlgorithmBox(nullptr),
     m_schedulingOptionsLayout(nullptr),
     m_schedulingRadioButtons(nullptr),
     m_quantumValueSelectorBox(nullptr),
     m_quantumValueSelector(nullptr),
+    m_proccessList(nullptr),
     m_runButton(nullptr),
     m_numberOfProccesses(0)
 {
@@ -32,8 +33,23 @@ MainWindow::MainWindow()
 void MainWindow::AddProccessBox()
 {
     m_numberOfProccesses++;
-    QGroupBox* addProccessWidget = new AddProccessWidget(m_numberOfProccesses, this);
-    m_mainLayout->insertWidget(m_numberOfProccesses, addProccessWidget);
+    m_proccessList->AddProccess(m_numberOfProccesses);
+}
+
+void MainWindow::ActivateOrDeactivateRunButton(int numberOfProccesses)
+{
+    // For the run button to be active, there must be
+    // at least one proccess on the list.
+    // The simulation can't run otherwise.
+    if(numberOfProccesses > 0)
+    {
+        m_runButton->setEnabled(true);
+    }
+    else
+    {
+        m_numberOfProccesses = 0;
+        m_runButton->setEnabled(false);
+    }
 }
 
 void MainWindow::Load()
@@ -43,12 +59,12 @@ void MainWindow::Load()
 
 void MainWindow::CreateButtons()
 {
-    m_addProccessButon = new QPushButton(tr("+\nAdd Process"), this);
-    m_addProccessButon->setFixedSize(QSize(70, 40));
-    m_addProccessButon->setStatusTip(tr("Add a new process."));
+    m_addProccessButton = new QPushButton(tr("+\nAdd Process"), this);
+    m_addProccessButton->setFixedSize(QSize(100, 50));
+    m_addProccessButton->setStatusTip(tr("Add a new process."));
 
     m_runButton = new QPushButton(tr(">\nRun"), this);
-    m_runButton->setFixedSize(QSize(80, 40));
+    m_runButton->setFixedSize(QSize(200, 80));
     m_runButton->setStatusTip(tr("Run simulation using the current confiuration."));
 
     QPalette pal = m_runButton->palette();
@@ -93,6 +109,8 @@ void MainWindow::CreateSchedulingAlgorithmSelectionBox()
     m_schedulingRadioButtons->addButton(sjfButton);
     m_schedulingRadioButtons->addButton(roundRobinButton);
     m_schedulingRadioButtons->addButton(edfButton);
+
+    m_schedulingAlgorithmBox->setFixedSize(300, 60);
 }
 
 void MainWindow::CreateQuantumValueSelectionBox()
@@ -107,6 +125,7 @@ void MainWindow::CreateQuantumValueSelectionBox()
     quantumSelectorGrid->addWidget(m_quantumValueSelector, 0, 1);
     
     m_quantumValueSelectorBox->setLayout(quantumSelectorGrid);
+    m_quantumValueSelectorBox->setFixedSize(300, 60);
 }
 
 
@@ -126,54 +145,33 @@ void MainWindow::CreateStatusBar()
 
 void MainWindow::CreateMainLayout()
 {
+    m_osSettingsGroup = new QGroupBox(tr("Scheduler Settings"), this);
+    m_schedulerSettingsLayout = new QBoxLayout(QBoxLayout::LeftToRight, m_osSettingsGroup);
+    m_schedulerSettingsLayout->insertWidget(0, m_schedulingAlgorithmBox);
+    m_schedulerSettingsLayout->insertWidget(1, m_quantumValueSelectorBox);
+    m_osSettingsGroup->setLayout(m_schedulerSettingsLayout);
+
+    m_prccessListGroup = new QWidget(m_osSettingsGroup);
+    m_proccessList = new ProccessList(this);
+    m_mainGrid = new QVBoxLayout();
+    m_mainGrid->addWidget(m_addProccessButton, 0, Qt::AlignCenter | Qt::AlignTop);
+    m_mainGrid->addWidget(m_proccessList);
+    m_prccessListGroup->setLayout(m_mainGrid);
+
+    m_mainLayout = new QVBoxLayout(this);
+    m_mainLayout->addWidget(m_osSettingsGroup);
+    m_mainLayout->addWidget(m_prccessListGroup);
+    m_mainLayout->addWidget(m_runButton, 0, Qt::AlignCenter);
+
     m_mainWidget = new QWidget(this);
-    m_mainLayout = new QBoxLayout(QBoxLayout::TopToBottom);
-
-    m_mainLayout->insertWidget(0, m_schedulingAlgorithmBox);
-    m_mainLayout->insertWidget(1, m_quantumValueSelectorBox);
-    m_mainLayout->insertSpacing(2, 10);
-    m_mainLayout->insertWidget(3, m_addProccessButon,  0, Qt::AlignCenter | Qt::AlignTop);
-    m_mainLayout->insertSpacing(4, 30);
-    m_mainLayout->insertWidget(5, m_runButton, 0, Qt::AlignCenter | Qt::AlignTop);
-    m_mainLayout->insertSpacing(6, 10);
-
-    // QTableWidget* tw = new QTableWidget(3, 1, this);
-    // QTableWidgetItem* pa = new QTableWidgetItem(tr("%1").arg(10));
-    // QTableWidgetItem* pd = new QTableWidgetItem(tr("%1").arg(3));
-    // QTableWidgetItem* pde = new QTableWidgetItem(tr("%1").arg(20));
-    // tw->setItem(0, 0, pa); 
-    // tw->setItem(1, 0, pd); 
-    // tw->setItem(2, 0, pde); 
-    // tw->setHorizontalHeaderItem(0, new QTableWidgetItem("Proccess 1"));
-    // tw->setVerticalHeaderItem(0, new QTableWidgetItem("Arrival"));
-    // tw->setVerticalHeaderItem(1, new QTableWidgetItem("Duration"));
-    // tw->setVerticalHeaderItem(2, new QTableWidgetItem("Deadline"));
-
-    // m_mainLayout->insertWidget(1, tw);
-    // for(int i = 0; i < 50; i++)
-    // {
-    //     for(int j = 0; j < 1; j++)
-    //     {
-    //         QTableWidgetItem* item = new QTableWidgetItem(tr("%1").arg(i + j));
-    //         item->setFlags(item->flags() ^ Qt::ItemIsEditable);
-    //         tw->setItem(i, j, item);
-    //     }
-    // }
     m_mainWidget->setLayout(m_mainLayout);
-    
-    // QPropertyAnimation* animation = new QPropertyAnimation(m_addProccessButon, "geometry");
-    // animation->setDuration(1000);
-    // animation->setStartValue(m_addProccessButon->geometry());
-    // QRect rc = m_addProccessButon->geometry();
-    // rc.setHeight( rc.height() + 50);
-    // animation->setEndValue(rc);
-    // animation->setEasingCurve(QEasingCurve::InQuad);
-    // animation->start();
 
     setCentralWidget(m_mainWidget);    
 }
 
 void MainWindow::ConnectWidgets()
 {
-    connect(m_addProccessButon, &QPushButton::clicked, this, &MainWindow::AddProccessBox);
+    connect(m_addProccessButton, &QPushButton::clicked, this, &MainWindow::AddProccessBox);
+    connect(m_proccessList, &ProccessList::NumberOfProccessesChanged, 
+        this, &MainWindow::ActivateOrDeactivateRunButton);
 }
