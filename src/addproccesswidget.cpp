@@ -1,6 +1,6 @@
-#include "proccessbox.h"
+#include "addproccesswidget.h"
 
-ProccessBox::ProccessBox(int proccessIndex, QWidget* parent)
+AddProccessWidget::AddProccessWidget(int proccessIndex, QWidget* parent)
 : QGroupBox(tr("Proccess %1").arg(proccessIndex), parent)
 {
     m_proccessLayout = new QGridLayout();
@@ -21,8 +21,8 @@ ProccessBox::ProccessBox(int proccessIndex, QWidget* parent)
     m_arrivalTimeInput->setMaximum(99999);
     m_arrivalTimeInput->setStatusTip(tr("Set the arrival time of the proccess."));
 
-    QPushButton* remove = new QPushButton(tr("Remove"), nullptr);
-    connect(remove, &QPushButton::clicked, this, ProccessBox::close);
+    QPushButton* removeButton = new QPushButton(tr("Remove"), nullptr);
+    connect(removeButton, &QPushButton::clicked, this, AddProccessWidget::close);
 
     m_proccessLayout->addWidget(m_priorityLabel, 0, 0);
     m_proccessLayout->addWidget(m_priorityInput, 0, 1);
@@ -30,12 +30,12 @@ ProccessBox::ProccessBox(int proccessIndex, QWidget* parent)
     m_proccessLayout->addWidget(m_durationInput, 1, 1);
     m_proccessLayout->addWidget(m_arrivalTimeLabel, 2, 0);
     m_proccessLayout->addWidget(m_arrivalTimeInput, 2, 1);
-    m_proccessLayout->addWidget(remove, 3, 0);
+    m_proccessLayout->addWidget(removeButton, 3, 0, Qt::AlignCenter);
 
     setLayout(m_proccessLayout);
 }
 
-int ProccessBox::GetArrivalTime()
+int AddProccessWidget::GetArrivalTime()
 {
     return m_arrivalTimeInput->value();
 }

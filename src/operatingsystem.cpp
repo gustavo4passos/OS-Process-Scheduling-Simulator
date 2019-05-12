@@ -108,7 +108,8 @@ void OperatingSystem::UpdateExecutionQueue()
         if((*proccess)->GetArrivalTime() == m_time)
         {
             m_executionQueue.push_back(*proccess);
-            std::cout << "Proccess " << (*proccess)->GetID() << " arrived." << std::endl;
+            std::cout << "Proccess " << (*proccess)->GetID() << 
+            " arrived." << std::endl;
             m_proccesses.erase(proccess);
         }
         else 

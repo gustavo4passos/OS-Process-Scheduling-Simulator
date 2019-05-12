@@ -20,12 +20,15 @@ Proccess::Proccess(
 
 void Proccess::Run(int currentTime)
 {
+    // Proccess is done, there is nothing to be done
     if(m_state == ProccessState::DONE) return;
 
+    // If proccess is currently idle, change its state
     if(m_state == ProccessState::IDLE)
     {
         m_state = ProccessState::RUNNING;
     }
+    
     if(m_state == ProccessState::OVERHEAD)
     {
         std::cout << "Overhead of proccess " << m_ID << std::endl;

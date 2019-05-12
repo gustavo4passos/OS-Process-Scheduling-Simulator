@@ -15,6 +15,8 @@ private slots:
 
 private:
     void CreateButtons();
+    void CreateSchedulingAlgorithmSelectionBox();
+    void CreateQuantumValueSelectionBox();
     void CreateMenuBar();
     void CreateStatusBar();
     void CreateMainLayout();
@@ -26,6 +28,14 @@ private:
     QPushButton* m_addProccessButon;
     QAction* m_loadAction;
 
+    QGroupBox* m_schedulingAlgorithmBox;
+    QHBoxLayout* m_schedulingOptionsLayout;
+    QButtonGroup* m_schedulingRadioButtons;
+
+    QGroupBox* m_quantumValueSelectorBox;
+    QSpinBox* m_quantumValueSelector;
+
+    QPushButton* m_runButton;
     int m_numberOfProccesses;
 };
 
