@@ -16,8 +16,7 @@ public:
         unsigned ID,
         unsigned arrivalTime,
         unsigned duration,
-        unsigned deadline,
-        unsigned priority
+        unsigned deadlinem
     );
 
     inline unsigned GetID()          const { return m_ID;          }
@@ -25,7 +24,6 @@ public:
     inline unsigned GetDuration()    const { return m_duration;    }
     inline unsigned GetTimeLeft()    const { return m_timeLeft;    }
     inline unsigned GetDeadline()    const { return m_deadline;    }
-    inline unsigned GetPriority()    const { return m_priority;    }
     // Returns when the proccess finished.
     // If the proccess has not yet finished,
     // it returns 0.
@@ -51,7 +49,6 @@ private:
     unsigned m_duration;
     unsigned m_timeLeft;
     unsigned m_deadline;
-    unsigned m_priority;
     ProccessState m_state;
     bool m_finished;
     unsigned m_finishTime;

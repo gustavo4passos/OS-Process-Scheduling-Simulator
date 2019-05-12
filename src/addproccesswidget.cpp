@@ -5,10 +5,10 @@ AddProccessWidget::AddProccessWidget(int proccessIndex, QWidget* parent)
 {
     m_proccessLayout = new QGridLayout();
 
-    m_priorityLabel = new QLabel(tr("Priority"), this);
-    m_priorityInput = new QSpinBox(this);
-    m_priorityInput->setMaximum(99999);
-    m_priorityInput->setStatusTip(tr("Set the priority for the proccess."));
+    m_deadlineLabel = new QLabel(tr("Deadline"), this);
+    m_deadlineInput = new QSpinBox(this);
+    m_deadlineInput->setMaximum(99999);
+    m_deadlineInput->setStatusTip(tr("Set the priority for the proccess."));
 
     m_durationLabel = new QLabel(tr("Duration"), this);
     m_durationInput = new QSpinBox(this);
@@ -25,8 +25,8 @@ AddProccessWidget::AddProccessWidget(int proccessIndex, QWidget* parent)
     connect(removeButton, &QPushButton::clicked, 
         this, &AddProccessWidget::RemoveButtonClicked);
 
-    m_proccessLayout->addWidget(m_priorityLabel, 0, 0);
-    m_proccessLayout->addWidget(m_priorityInput, 0, 1);
+    m_proccessLayout->addWidget(m_deadlineLabel, 0, 0);
+    m_proccessLayout->addWidget(m_deadlineInput, 0, 1);
     m_proccessLayout->addWidget(m_durationLabel, 1, 0);
     m_proccessLayout->addWidget(m_durationInput, 1, 1);
     m_proccessLayout->addWidget(m_arrivalTimeLabel, 2, 0);
