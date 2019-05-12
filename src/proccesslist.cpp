@@ -7,10 +7,8 @@ ProccessList::ProccessList(QWidget* parent)
     m_centralWidget(nullptr),
     m_numberOfProccesses(0)
 {
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     setWidgetResizable(true);
     setFixedHeight(190);
-    setFixedWidth(600);
     CreateMainLayout();
 }
 

@@ -5,14 +5,12 @@ Proccess::Proccess(
     unsigned ID, 
     unsigned arrivalTime,
     unsigned duration,
-    unsigned deadline,
-    unsigned priority)
+    unsigned deadline)
 :   m_ID(ID),
     m_arrivalTime(arrivalTime),
     m_duration(duration),
     m_timeLeft(duration),
     m_deadline(deadline),
-    m_priority(priority),
     m_state(ProccessState::IDLE),
     m_finished(false),
     m_finishTime(0)

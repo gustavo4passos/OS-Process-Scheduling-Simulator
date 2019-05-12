@@ -20,8 +20,8 @@ signals:
 
 private:
     QGridLayout* m_proccessLayout;
-    QLabel* m_priorityLabel;
-    QSpinBox* m_priorityInput;
+    QLabel* m_deadlineLabel;
+    QSpinBox* m_deadlineInput;
     QLabel* m_durationLabel;
     QSpinBox* m_durationInput;
     QLabel* m_arrivalTimeLabel;

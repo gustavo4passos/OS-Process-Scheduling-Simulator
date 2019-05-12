@@ -3,16 +3,23 @@
 #include "proccesslist.h"
 
 MainWindow::MainWindow()
-:   m_schedulerSettingsLayout(nullptr),
+:   m_mainWidget(nullptr),
+    m_mainLayout(nullptr),
     m_fileMenu(nullptr),
-    m_addProccessButton(nullptr),
     m_loadAction(nullptr),
+    m_schedulerSettingsGroup(nullptr),
+    m_schedulerSettingsLayout(nullptr),
     m_schedulingAlgorithmBox(nullptr),
-    m_schedulingOptionsLayout(nullptr),
+    m_sheculingAlgorithmBoxLayout(nullptr),
     m_schedulingRadioButtons(nullptr),
     m_quantumValueSelectorBox(nullptr),
     m_quantumValueSelector(nullptr),
+    m_overheadValueSelectorBox(nullptr),
+    m_overheadValueSelector(nullptr),
+    m_proccessListGroup(nullptr),
+    m_proccessGroupLayout(nullptr),
     m_proccessList(nullptr),
+    m_addProccessButton(nullptr),
     m_runButton(nullptr),
     m_numberOfProccesses(0)
 {
@@ -23,6 +30,7 @@ MainWindow::MainWindow()
     CreateStatusBar();
     CreateSchedulingAlgorithmSelectionBox();
     CreateQuantumValueSelectionBox();
+    CreateOverheadValueSelectionBox();
     CreateMainLayout();
     ConnectWidgets();
 
@@ -44,11 +52,15 @@ void MainWindow::ActivateOrDeactivateRunButton(int numberOfProccesses)
     if(numberOfProccesses > 0)
     {
         m_runButton->setEnabled(true);
+        m_runButton->setStatusTip(tr("Run simulation using the current confiuration."));
+
     }
     else
     {
         m_numberOfProccesses = 0;
         m_runButton->setEnabled(false);
+        m_runButton->setStatusTip(tr("Unable to run simulation: At least one proccess is needed."));
+
     }
 }
 
@@ -64,14 +76,15 @@ void MainWindow::CreateButtons()
     m_addProccessButton->setStatusTip(tr("Add a new process."));
 
     m_runButton = new QPushButton(tr(">\nRun"), this);
+    m_runButton->setStatusTip(tr("Unable to run simulation: At least one proccess is needed."));
     m_runButton->setFixedSize(QSize(200, 80));
-    m_runButton->setStatusTip(tr("Run simulation using the current confiuration."));
 
     QPalette pal = m_runButton->palette();
     pal.setColor(QPalette::Button, QColor(Qt::green));
     m_runButton->setAutoFillBackground(true);
     m_runButton->setPalette(pal);
     m_runButton->update();
+
 
     // Start button as disabled, because
     // at least one proccess is needed to
@@ -83,17 +96,17 @@ void MainWindow::CreateButtons()
 void MainWindow::CreateSchedulingAlgorithmSelectionBox()
 {
     m_schedulingAlgorithmBox = new QGroupBox(tr("Scheduling algorithm"), this);
-    m_schedulingOptionsLayout = new QHBoxLayout(m_schedulingAlgorithmBox);
+    m_sheculingAlgorithmBoxLayout = new QHBoxLayout(m_schedulingAlgorithmBox);
     // Radio buttons
     QRadioButton* fifoButton = new QRadioButton(tr("FIFO"), m_schedulingAlgorithmBox);
     QRadioButton* sjfButton = new QRadioButton(tr("SJF"), m_schedulingAlgorithmBox);
     QRadioButton* roundRobinButton = new QRadioButton(tr("Round Robin"), m_schedulingAlgorithmBox);
     QRadioButton* edfButton = new QRadioButton(tr("EDF"), m_schedulingAlgorithmBox);
 
-    m_schedulingOptionsLayout->insertWidget(0, fifoButton);
-    m_schedulingOptionsLayout->insertWidget(1, sjfButton);
-    m_schedulingOptionsLayout->insertWidget(2, roundRobinButton);
-    m_schedulingOptionsLayout->insertWidget(3, edfButton);
+    m_sheculingAlgorithmBoxLayout->insertWidget(0, fifoButton);
+    m_sheculingAlgorithmBoxLayout->insertWidget(1, sjfButton);
+    m_sheculingAlgorithmBoxLayout->insertWidget(2, roundRobinButton);
+    m_sheculingAlgorithmBoxLayout->insertWidget(3, edfButton);
 
     // Set FIFO option checked by default
     fifoButton->setChecked(true);
@@ -118,14 +131,32 @@ void MainWindow::CreateQuantumValueSelectionBox()
     m_quantumValueSelectorBox = new QGroupBox(tr("Quantum"), this);
 
     QGridLayout* quantumSelectorGrid = new QGridLayout(m_quantumValueSelectorBox);
-    QLabel* quantumSelector = new QLabel(tr("Duration"), m_quantumValueSelectorBox);
+    QLabel* quantumLabel = new QLabel(tr("Duration"), m_quantumValueSelectorBox);
     m_quantumValueSelector = new QSpinBox(m_quantumValueSelectorBox);
+    m_quantumValueSelector->setStatusTip(tr("Select the duration of the quantum."));
     m_quantumValueSelector->setMinimum(1);
-    quantumSelectorGrid->addWidget(quantumSelector, 0, 0);
+    quantumSelectorGrid->addWidget(quantumLabel, 0, 0);
     quantumSelectorGrid->addWidget(m_quantumValueSelector, 0, 1);
     
     m_quantumValueSelectorBox->setLayout(quantumSelectorGrid);
-    m_quantumValueSelectorBox->setFixedSize(300, 60);
+    m_quantumValueSelectorBox->setFixedSize(120, 60);
+}
+
+void MainWindow::CreateOverheadValueSelectionBox()
+{
+    m_overheadValueSelectorBox = new QGroupBox(tr("Overhead"));
+
+    QGridLayout* overheadSelectorGrid = new QGridLayout(m_overheadValueSelectorBox);
+    QLabel* overheadLabel = new QLabel(tr("Value"), m_overheadValueSelectorBox);
+    m_overheadValueSelector = new QSpinBox(m_overheadValueSelectorBox);
+    m_overheadValueSelector->setStatusTip(tr("Select the duration of the scheduler overhead."));
+    m_overheadValueSelector->setMinimum(1);
+
+    overheadSelectorGrid->addWidget(overheadLabel, 0, 0);
+    overheadSelectorGrid->addWidget(m_overheadValueSelector, 0, 1);
+
+    m_overheadValueSelectorBox->setLayout(overheadSelectorGrid);
+    m_overheadValueSelectorBox->setFixedSize(100, 60);
 }
 
 
@@ -145,22 +176,26 @@ void MainWindow::CreateStatusBar()
 
 void MainWindow::CreateMainLayout()
 {
-    m_osSettingsGroup = new QGroupBox(tr("Scheduler Settings"), this);
-    m_schedulerSettingsLayout = new QBoxLayout(QBoxLayout::LeftToRight, m_osSettingsGroup);
+    m_schedulerSettingsGroup = new QGroupBox(tr("Scheduler Settings"), this);
+    m_schedulerSettingsLayout = new QBoxLayout(QBoxLayout::LeftToRight, m_schedulerSettingsGroup);
     m_schedulerSettingsLayout->insertWidget(0, m_schedulingAlgorithmBox);
     m_schedulerSettingsLayout->insertWidget(1, m_quantumValueSelectorBox);
-    m_osSettingsGroup->setLayout(m_schedulerSettingsLayout);
+    m_schedulerSettingsLayout->insertWidget(2, m_overheadValueSelectorBox);
+    m_schedulerSettingsGroup->setLayout(m_schedulerSettingsLayout);
 
-    m_prccessListGroup = new QWidget(m_osSettingsGroup);
+    m_proccessListGroup = new QWidget(m_schedulerSettingsGroup);
     m_proccessList = new ProccessList(this);
-    m_mainGrid = new QVBoxLayout();
-    m_mainGrid->addWidget(m_addProccessButton, 0, Qt::AlignCenter | Qt::AlignTop);
-    m_mainGrid->addWidget(m_proccessList);
-    m_prccessListGroup->setLayout(m_mainGrid);
+    m_proccessGroupLayout = new QVBoxLayout();
+    m_proccessGroupLayout->addWidget(m_addProccessButton, 0, Qt::AlignCenter | Qt::AlignTop);
+    m_proccessGroupLayout->addSpacing(5);
+    m_proccessGroupLayout->addWidget(m_proccessList);
+    m_proccessListGroup->setLayout(m_proccessGroupLayout);
 
     m_mainLayout = new QVBoxLayout(this);
-    m_mainLayout->addWidget(m_osSettingsGroup);
-    m_mainLayout->addWidget(m_prccessListGroup);
+    m_mainLayout->addWidget(m_schedulerSettingsGroup);
+    m_mainLayout->addSpacing(10);
+    m_mainLayout->addWidget(m_proccessListGroup);
+    m_mainLayout->addSpacing(30);
     m_mainLayout->addWidget(m_runButton, 0, Qt::AlignCenter);
 
     m_mainWidget = new QWidget(this);

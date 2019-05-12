@@ -20,28 +20,30 @@ private:
     void CreateButtons();
     void CreateSchedulingAlgorithmSelectionBox();
     void CreateQuantumValueSelectionBox();
+    void CreateOverheadValueSelectionBox();
     void CreateMenuBar();
     void CreateStatusBar();
     void CreateMainLayout();
     void ConnectWidgets();
 
     QWidget* m_mainWidget;
-
-    QVBoxLayout* m_mainGrid;
     QVBoxLayout* m_mainLayout;
 
-    QGroupBox* m_osSettingsGroup;
     QMenu* m_fileMenu;
     QAction* m_loadAction;
 
-    QGroupBox* m_schedulingAlgorithmBox;
+    QGroupBox* m_schedulerSettingsGroup;
     QBoxLayout* m_schedulerSettingsLayout;
-    QHBoxLayout* m_schedulingOptionsLayout;
+    QGroupBox* m_schedulingAlgorithmBox;
+    QHBoxLayout* m_sheculingAlgorithmBoxLayout;
     QButtonGroup* m_schedulingRadioButtons;
     QGroupBox* m_quantumValueSelectorBox;
     QSpinBox* m_quantumValueSelector;
+    QGroupBox* m_overheadValueSelectorBox;
+    QSpinBox* m_overheadValueSelector;
 
-    QWidget* m_prccessListGroup;
+    QWidget* m_proccessListGroup;
+    QVBoxLayout* m_proccessGroupLayout;
     ProccessList* m_proccessList;
     QPushButton* m_addProccessButton;
 
