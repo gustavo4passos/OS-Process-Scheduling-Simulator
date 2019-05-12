@@ -31,7 +31,6 @@ void Proccess::Run(int currentTime)
     
     if(m_state == ProccessState::OVERHEAD)
     {
-        std::cout << "Overhead of proccess " << m_ID << std::endl;
         return;
     }
 
@@ -46,7 +45,6 @@ void Proccess::Run(int currentTime)
         m_finishTime = currentTime;
     }
     
-    std::cout << "Running proccess " << m_ID << " time left " << m_timeLeft << std::endl;
 }
 
 void Proccess::Reset()

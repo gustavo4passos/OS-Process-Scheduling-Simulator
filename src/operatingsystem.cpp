@@ -49,7 +49,6 @@ bool OperatingSystem::NextStep()
     // there is nothing to be done.
     if(m_executionQueue.size() == 0 && m_proccesses.size() == 0) return false;
 
-    std::cout << "Moment " << m_time << std::endl;;
     UpdateExecutionQueue();
 
     // Advances time
@@ -108,8 +107,6 @@ void OperatingSystem::UpdateExecutionQueue()
         if((*proccess)->GetArrivalTime() == m_time)
         {
             m_executionQueue.push_back(*proccess);
-            std::cout << "Proccess " << (*proccess)->GetID() << 
-            " arrived." << std::endl;
             m_proccesses.erase(proccess);
         }
         else 
