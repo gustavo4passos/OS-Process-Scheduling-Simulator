@@ -1,0 +1,10 @@
+debug/main.o
+debug/mainwindow.o
+debug/proccessbox.o
+debug/operatingsystem.o
+debug/proccess.o
+debug/scheduler.o
+debug/proccesslist.o
+debug/moc_mainwindow.o
+debug/moc_proccessbox.o
+debug/moc_proccesslist.o
