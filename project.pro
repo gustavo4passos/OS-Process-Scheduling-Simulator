@@ -15,4 +15,4 @@ SOURCES += src/proccesslist.cpp
 QT += core
 QT += widgets
 
-TARGET = main
+TARGET = os-scheduling-simulator
