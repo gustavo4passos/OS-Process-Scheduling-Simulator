@@ -1,5 +1,5 @@
 #include "proccesslist.h"
-#include "addproccesswidget.h"
+#include "proccessbox.h"
 
 ProccessList::ProccessList(QWidget* parent)
 :   QScrollArea(parent),
@@ -14,8 +14,8 @@ ProccessList::ProccessList(QWidget* parent)
 
 void ProccessList::AddProccess(int index)
 {
-    AddProccessWidget* proccessBox = new AddProccessWidget(index, this);
-    connect(proccessBox, &AddProccessWidget::RemoveProccessRequested,
+    ProccessBox* proccessBox = new ProccessBox(index, this);
+    connect(proccessBox, &ProccessBox::RemoveProccessRequested,
         this, &ProccessList::RemoveProccess);
     m_mainLayout->insertWidget(m_numberOfProccesses, proccessBox, 
         0, Qt::AlignLeft | Qt::AlignTop);
@@ -24,6 +24,24 @@ void ProccessList::AddProccess(int index)
 
     emit NumberOfProccessesChanged(m_numberOfProccesses);
 }
+
+std::vector<ProccessTemplate> ProccessList::GetCurrentProccesses()
+{
+    std::vector<ProccessTemplate> proccessTemplates;
+    for(int i = 0; i < m_mainLayout->count(); ++i)
+    {
+        ProccessBox* pWidget = static_cast<ProccessBox*>(m_mainLayout->itemAt(i)->widget());
+        proccessTemplates.push_back({
+            pWidget->GetID(),
+            pWidget->GetDuration(),
+            pWidget->GetArrivalTime(),
+            pWidget->GetDeadline()
+        });
+    }
+
+    return proccessTemplates;
+}
+
 
 void ProccessList::RemoveProccess(QWidget* widget)
 {

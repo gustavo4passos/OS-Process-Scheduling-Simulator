@@ -16,14 +16,15 @@ public:
         unsigned ID,
         unsigned arrivalTime,
         unsigned duration,
-        unsigned deadlinem
+        unsigned deadline
     );
 
-    inline unsigned GetID()          const { return m_ID;          }
-    inline unsigned GetArrivalTime() const { return m_arrivalTime; }
-    inline unsigned GetDuration()    const { return m_duration;    }
-    inline unsigned GetTimeLeft()    const { return m_timeLeft;    }
-    inline unsigned GetDeadline()    const { return m_deadline;    }
+    inline unsigned GetID()          const { return m_ID;                       }
+    inline unsigned GetArrivalTime() const { return m_arrivalTime;              }
+    inline unsigned GetDuration()    const { return m_duration;                 }
+    inline unsigned GetTimeLeft()    const { return m_timeLeft;                 }
+    inline unsigned GetDeadline()    const { return m_arrivalTime + m_deadline; }
+    
     // Returns when the proccess finished.
     // If the proccess has not yet finished,
     // it returns 0.
