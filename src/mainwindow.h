@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QtWidgets\QtWidgets>
+#include "operatingsystem.h"
 
 class ProccessList;
 
@@ -25,6 +26,10 @@ private:
     void CreateStatusBar();
     void CreateMainLayout();
     void ConnectWidgets();
+
+    void RunSimulation();
+    SchedulingAlgorithm GetSchedulingAlgorithm();
+
 
     QWidget* m_mainWidget;
     QVBoxLayout* m_mainLayout;

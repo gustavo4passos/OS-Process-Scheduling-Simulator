@@ -2,8 +2,6 @@
 #include "proccess.h"
 #include "scheduler.h"
 
-#include <iostream>
-
 OperatingSystem::OperatingSystem(
     int quantum,
     int overhead,
@@ -13,6 +11,34 @@ OperatingSystem::OperatingSystem(
     m_time(0)
 {
     m_scheduler = new Scheduler(quantum, overhead, schedulingAlgorithm);
+}
+
+OperatingSystem::~OperatingSystem()
+{
+    delete m_scheduler;
+    m_scheduler = nullptr;
+
+    // Remove proccesses from memory
+    for(auto proccess = m_proccesses.begin();
+        proccess != m_proccesses.end();)
+    {
+        delete *proccess;
+        m_proccesses.erase(proccess);
+    }
+
+    for(auto proccess = m_executionQueue.begin();
+        proccess != m_executionQueue.end();)
+    {
+        delete *proccess;
+        m_executionQueue.erase(proccess);
+    }
+
+    for(auto proccess = m_finishedProccesses.begin();
+        proccess != m_finishedProccesses.end();)
+    {
+        delete *proccess;
+        m_finishedProccesses.erase(proccess);
+    }
 }
 
 float OperatingSystem::GetAverageTurnaround() const
@@ -33,13 +59,16 @@ float OperatingSystem::GetAverageTurnaround() const
     return (float)totalExecutionTime / numberOfFinishedProccessses;
 }
 
-void OperatingSystem::AddProccess(Proccess* proccess)
+
+
+void OperatingSystem::AddProccess(
+    int id, 
+    unsigned arrivalTime, 
+    unsigned duration, 
+    unsigned deadline)
 {
-    if(proccess != nullptr) 
-    {
-        m_proccesses.push_back(proccess);
-        m_numberOfProccesses++;
-    }
+    m_proccesses.push_back(new Proccess(id, arrivalTime, duration, deadline));
+    m_numberOfProccesses++;
 }
 
 bool OperatingSystem::NextStep()

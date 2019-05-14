@@ -329,6 +329,21 @@ void Scheduler::MoveProccessWithEarliestDeadline(std::vector<Proccess*>* executi
                 earliestDeadlProccIt = p;
                 earliestDeadline = (*p)->GetDeadline();
             }
+            // If both proccesses have the same ID 
+            // give priority to the one with lower id.
+            // (This is done to standardize the order 
+            // and make it predictable to the user,
+            // because the order in the execution queue
+            // can be disorganized).
+            else if((*p)->GetDeadline() == earliestDeadline)
+            {
+                if((*p)->GetID() < earliestDeadlProcc->GetID())
+                {
+                    earliestDeadlProcc = (*p);
+                    earliestDeadlProccIt = p;
+                    earliestDeadline = (*p)->GetDeadline();
+                } 
+            }
         }
 
         // If the shortest job is not at the front

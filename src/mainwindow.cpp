@@ -1,9 +1,11 @@
 #include "mainwindow.h"
-#include "addproccesswidget.h"
+#include <string>
+#include "proccessbox.h"
 #include "proccesslist.h"
 
 MainWindow::MainWindow()
-:   m_mainWidget(nullptr),
+:   QMainWindow(),
+    m_mainWidget(nullptr),
     m_mainLayout(nullptr),
     m_fileMenu(nullptr),
     m_loadAction(nullptr),
@@ -92,7 +94,6 @@ void MainWindow::CreateButtons()
     m_runButton->setEnabled(false);
 }
 
-    #include <iostream>
 void MainWindow::CreateSchedulingAlgorithmSelectionBox()
 {
     m_schedulingAlgorithmBox = new QGroupBox(tr("Scheduling algorithm"), this);
@@ -209,4 +210,52 @@ void MainWindow::ConnectWidgets()
     connect(m_addProccessButton, &QPushButton::clicked, this, &MainWindow::AddProccessBox);
     connect(m_proccessList, &ProccessList::NumberOfProccessesChanged, 
         this, &MainWindow::ActivateOrDeactivateRunButton);
+    connect(m_runButton, &QPushButton::clicked, this, &RunSimulation);
+}
+
+void MainWindow::RunSimulation()
+{
+    OperatingSystem os = OperatingSystem(m_quantumValueSelector->value(),
+                                         m_overheadValueSelector->value(),
+                                         GetSchedulingAlgorithm());
+
+    std::vector<ProccessTemplate> proccesses = m_proccessList->GetCurrentProccesses();
+    for(auto pTemplate = proccesses.begin();
+        pTemplate != proccesses.end();
+        pTemplate++)
+    {
+        os.AddProccess(
+            pTemplate->ID, 
+            pTemplate->arrivalTime, 
+            pTemplate->duration, 
+            pTemplate->deadline);
+    }
+
+    // Run all steps
+    while(os.NextStep());
+
+    float averageTurnaround = os.GetAverageTurnaround();
+    unsigned executionTime = os.GetExecutionTime();
+
+    QMessageBox::information(this, tr("Simulation Result"),
+        tr("Execution time: %1 t.u.\nAverage turnaround: %2 t.u.").arg(
+            executionTime).arg(averageTurnaround),
+            QMessageBox::StandardButton::Ok);
+}
+
+SchedulingAlgorithm MainWindow::GetSchedulingAlgorithm()
+{
+    QRadioButton* selectedButton = 
+        static_cast<QRadioButton*>(m_schedulingRadioButtons->checkedButton());    
+
+    SchedulingAlgorithm selectedAlgorithm;
+
+    QString buttonText = selectedButton->text();
+
+    if(buttonText == "FIFO") selectedAlgorithm = SchedulingAlgorithm::FIFO;
+    else if(buttonText == "SJF") selectedAlgorithm = SchedulingAlgorithm::SJF;
+    else if(buttonText == "Round Robin") selectedAlgorithm = SchedulingAlgorithm::ROUND_ROBIN;
+    else selectedAlgorithm = SchedulingAlgorithm::EDF;
+
+    return selectedAlgorithm;
 }

@@ -1,10 +1,10 @@
 release/main.o
 release/mainwindow.o
-release/addproccesswidget.o
+release/proccessbox.o
 release/operatingsystem.o
 release/proccess.o
 release/scheduler.o
 release/proccesslist.o
 release/moc_mainwindow.o
-release/moc_addproccesswidget.o
+release/moc_proccessbox.o
 release/moc_proccesslist.o

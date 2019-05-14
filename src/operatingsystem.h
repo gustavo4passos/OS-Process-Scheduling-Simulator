@@ -2,13 +2,12 @@
 #define OPERATINGSYSTEM_H
 
 #include <vector>
-#include <set>
+#include "operatingsystem.h"
 #include "proccess.h"
 #include "scheduler.h"
 
+
 class Memory;
-class Proccess;
-class Scheduler;
 
 class OperatingSystem
 {
@@ -18,18 +17,20 @@ public:
         int overhead, 
         SchedulingAlgorithm schedulingAlgorithm
     );
+    ~OperatingSystem();
 
     inline unsigned int GetQuantum()        const { return m_quantum; }
     inline unsigned int GetOverhead()       const { return m_overhead; }
     inline unsigned GetNumberOfProccesses() const { return m_numberOfProccesses; }
 
     float GetAverageTurnaround() const;
+    unsigned GetExecutionTime() const { return m_time; }
 
     const std::vector<Proccess*>& GetFinishedProccesses() const { return m_finishedProccesses; }
     const std::vector<Proccess*>& GetActiveProccesses()   const { return m_executionQueue;     }
 
     // Add a proccess to the proccess list.
-    void AddProccess(Proccess* proccess);
+    void AddProccess(int id, unsigned arrivalTime, unsigned duration, unsigned deadline);
 
     // Simulates for one time unit.
     // If there are still steps to be taken, return true.
@@ -61,6 +62,7 @@ private:
 
     // Add arriving proccess to the execution queue
     void UpdateExecutionQueue();
+
 };
 
 #endif

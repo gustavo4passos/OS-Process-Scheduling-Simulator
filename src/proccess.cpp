@@ -1,5 +1,4 @@
 #include "proccess.h"
-#include <iostream>
 
 Proccess::Proccess(
     unsigned ID, 

@@ -2,8 +2,6 @@
 #include "mainwindow.h"
 #include "operatingsystem.h"
 
-#include <iostream>
-
 int main(int argc, char* args[])
 {
     QApplication app(argc, args);

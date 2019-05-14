@@ -2,6 +2,15 @@
 #define PROCCESSLIST_H
 
 #include <QtWidgets/QtWidgets>
+#include <vector>
+
+struct ProccessTemplate
+{
+    unsigned ID;
+    unsigned duration;
+    unsigned arrivalTime;
+    unsigned deadline;
+};
 
 class ProccessList : public QScrollArea
 {
@@ -10,6 +19,7 @@ class ProccessList : public QScrollArea
 public:
     ProccessList(QWidget* parent = nullptr);
     void AddProccess(int index);
+    std::vector<ProccessTemplate> GetCurrentProccesses();
 
 signals:
     void NumberOfProccessesChanged(int value);
