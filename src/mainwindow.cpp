@@ -210,7 +210,7 @@ void MainWindow::ConnectWidgets()
     connect(m_addProccessButton, &QPushButton::clicked, this, &MainWindow::AddProccessBox);
     connect(m_proccessList, &ProccessList::NumberOfProccessesChanged, 
         this, &MainWindow::ActivateOrDeactivateRunButton);
-    connect(m_runButton, &QPushButton::clicked, this, &RunSimulation);
+    connect(m_runButton, &QPushButton::clicked, this, &MainWindow::RunSimulation);
 }
 
 void MainWindow::RunSimulation()

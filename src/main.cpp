@@ -1,4 +1,4 @@
-#include <QtWidgets\QApplication>
+#include <QApplication>
 #include "mainwindow.h"
 #include "operatingsystem.h"
 

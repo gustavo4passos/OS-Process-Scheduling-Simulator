@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtWidgets\QtWidgets>
+#include <QtWidgets/QtWidgets>
 #include "operatingsystem.h"
 
 class ProccessList;
