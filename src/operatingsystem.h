@@ -6,7 +6,6 @@
 #include "proccess.h"
 #include "scheduler.h"
 
-
 class Memory;
 
 class OperatingSystem

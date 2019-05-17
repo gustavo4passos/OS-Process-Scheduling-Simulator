@@ -4,6 +4,7 @@ HEADERS += src/operatingsystem.h
 HEADERS += src/memory.h
 HEADERS += src/scheduler.h
 HEADERS += src/proccesslist.h
+HEADERS += src/proccesslistloader.h
 SOURCES += src/main.cpp
 SOURCES += src/mainwindow.cpp
 SOURCES += src/proccessbox.cpp
@@ -11,8 +12,11 @@ SOURCES += src/operatingsystem.cpp
 SOURCES += src/proccess.cpp
 SOURCES += src/scheduler.cpp
 SOURCES += src/proccesslist.cpp
+SOURCES += src/proccesslistloader.cpp
 
 QT += core
 QT += widgets
 
 TARGET = os-scheduling-simulator
+DESTDIR = ./bin
+OBJECTS_DIR = ./build

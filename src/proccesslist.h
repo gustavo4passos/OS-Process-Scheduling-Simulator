@@ -20,6 +20,7 @@ public:
     ProccessList(QWidget* parent = nullptr);
     void AddProccess(int index);
     std::vector<ProccessTemplate> GetCurrentProccesses();
+    void ClearProccesses();
 
 signals:
     void NumberOfProccessesChanged(int value);

@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include <string>
 #include "proccessbox.h"
-#include "proccesslist.h"
+#include "proccesslistloader.h"
 
 MainWindow::MainWindow()
 :   QMainWindow(),
@@ -53,22 +53,44 @@ void MainWindow::ActivateOrDeactivateRunButton(int numberOfProccesses)
     // The simulation can't run otherwise.
     if(numberOfProccesses > 0)
     {
+        QPalette pal = m_runButton->palette();
+        pal.setColor(QPalette::Button, QColor(Qt::green));
+        m_runButton->setAutoFillBackground(true);
+        m_runButton->setPalette(pal);
+        m_runButton->update();
         m_runButton->setEnabled(true);
         m_runButton->setStatusTip(tr("Run simulation using the current confiuration."));
-
     }
     else
     {
+        QPalette pal = m_runButton->palette();
+        pal.setColor(QPalette::Button, QColor(Qt::green));
+        m_runButton->setAutoFillBackground(true);
+        m_runButton->setPalette(pal);
+        m_runButton->update();
         m_numberOfProccesses = 0;
         m_runButton->setEnabled(false);
         m_runButton->setStatusTip(tr("Unable to run simulation: At least one proccess is needed."));
-
     }
 }
 
 void MainWindow::Load()
 {
     QString filename = QFileDialog::getOpenFileName(this, "Select file");
+}
+
+void MainWindow::Save()
+{
+    QString filename = QFileDialog::getSaveFileName(
+        this, 
+        tr("Save Proccess List"), 
+        QString(),
+        tr("Proccess List File (*.plf)"));
+
+    std::string filenameString = filename.toUtf8().constData();
+    
+    std::vector<ProccessTemplate> proccessList = m_proccessList->GetCurrentProccesses();
+    ProccessListLoader::SaveProccessList(filenameString, proccessList);
 }
 
 void MainWindow::CreateButtons()
@@ -82,7 +104,7 @@ void MainWindow::CreateButtons()
     m_runButton->setFixedSize(QSize(200, 80));
 
     QPalette pal = m_runButton->palette();
-    pal.setColor(QPalette::Button, QColor(Qt::green));
+    pal.setColor(QPalette::Button, QColor(Qt::gray));
     m_runButton->setAutoFillBackground(true);
     m_runButton->setPalette(pal);
     m_runButton->update();
@@ -164,10 +186,18 @@ void MainWindow::CreateOverheadValueSelectionBox()
 void MainWindow::CreateMenuBar()
 {
     m_fileMenu = menuBar()->addMenu(tr("&File"));
+    
     m_loadAction = new QAction(tr("Load"), this);
+    m_loadAction->setShortcut(QKeySequence::Open);
+    m_loadAction->setStatusTip(tr("Load proccess configuration from file."));
     connect(m_loadAction, &QAction::triggered, this, &MainWindow::Load);
-
     m_fileMenu->addAction(m_loadAction);
+
+    m_saveAction = new QAction(tr("Save"), this);
+    m_saveAction->setShortcut(QKeySequence::Save);
+    m_saveAction->setStatusTip(tr("Save proccess configuration to a file."));
+    connect(m_saveAction, &QAction::triggered, this, &MainWindow::Save);
+    m_fileMenu->addAction(m_saveAction);
 }
 
 void MainWindow::CreateStatusBar()
@@ -186,13 +216,13 @@ void MainWindow::CreateMainLayout()
 
     m_proccessListGroup = new QWidget(m_schedulerSettingsGroup);
     m_proccessList = new ProccessList(this);
-    m_proccessGroupLayout = new QVBoxLayout();
+    m_proccessGroupLayout = new QVBoxLayout(m_proccessListGroup);
     m_proccessGroupLayout->addWidget(m_addProccessButton, 0, Qt::AlignCenter | Qt::AlignTop);
     m_proccessGroupLayout->addSpacing(5);
     m_proccessGroupLayout->addWidget(m_proccessList);
     m_proccessListGroup->setLayout(m_proccessGroupLayout);
 
-    m_mainLayout = new QVBoxLayout(this);
+    m_mainLayout = new QVBoxLayout(m_mainWidget);
     m_mainLayout->addWidget(m_schedulerSettingsGroup);
     m_mainLayout->addSpacing(10);
     m_mainLayout->addWidget(m_proccessListGroup);
@@ -210,7 +240,7 @@ void MainWindow::ConnectWidgets()
     connect(m_addProccessButton, &QPushButton::clicked, this, &MainWindow::AddProccessBox);
     connect(m_proccessList, &ProccessList::NumberOfProccessesChanged, 
         this, &MainWindow::ActivateOrDeactivateRunButton);
-    connect(m_runButton, &QPushButton::clicked, this, &RunSimulation);
+    connect(m_runButton, &QPushButton::clicked, this, &MainWindow::RunSimulation);
 }
 
 void MainWindow::RunSimulation()

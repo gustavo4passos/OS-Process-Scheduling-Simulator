@@ -32,8 +32,12 @@
 *.app
 
 # Executable folders
+bin/
 debug/
 release/
+
+# Objects folder
+build/
 
 # vscode files
 .vscode/

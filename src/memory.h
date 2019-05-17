@@ -15,7 +15,7 @@ public:
     Memory(int numberOfPages);
 
 private:
-    std::vector<Page> pages;
+    std::vector<Page> m_pages;
 };
 
 #endif

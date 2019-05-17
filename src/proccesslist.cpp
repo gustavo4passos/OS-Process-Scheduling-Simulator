@@ -25,6 +25,15 @@ void ProccessList::AddProccess(int index)
     emit NumberOfProccessesChanged(m_numberOfProccesses);
 }
 
+void ProccessList::ClearProccesses()
+{
+    for(int i = 0; i < m_mainLayout->count();)
+    {
+        QWidget* proccess = m_mainLayout->itemAt(i)->widget();
+        RemoveProccess(proccess);
+    }
+}
+
 std::vector<ProccessTemplate> ProccessList::GetCurrentProccesses()
 {
     std::vector<ProccessTemplate> proccessTemplates;

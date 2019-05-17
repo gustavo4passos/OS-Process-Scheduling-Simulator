@@ -1,6 +1,8 @@
 #ifndef PROCCESS_H
 #define PROCCESS_H
 
+#include <vector>
+
 enum class ProccessState
 {
   IDLE,
@@ -37,6 +39,7 @@ public:
     inline void SetFinishTime(int time) { m_finishTime = time; }
 
     void Run(int currentTime);
+
     // Reset procccess to its initial state
     void Reset();
 
@@ -53,6 +56,9 @@ private:
     ProccessState m_state;
     bool m_finished;
     unsigned m_finishTime;
+    unsigned m_nPages;
+
+    std::vector<unsigned> m_pages;
 };
 
 #endif
