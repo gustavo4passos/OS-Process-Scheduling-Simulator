@@ -97,6 +97,9 @@ void MainWindow::Save()
         QString(),
         tr("Proccess List File (*.plf)"));
 
+    // If the users cancelled the action
+    if(filename == "") return;
+
     std::string filenameString = filename.toUtf8().constData();
 	std::string extension = ".plf";
 
