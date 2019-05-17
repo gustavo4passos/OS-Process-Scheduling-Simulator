@@ -7,8 +7,8 @@
 struct ProccessTemplate
 {
     unsigned ID;
-    unsigned duration;
     unsigned arrivalTime;
+    unsigned duration;
     unsigned deadline;
 };
 
@@ -19,6 +19,9 @@ class ProccessList : public QScrollArea
 public:
     ProccessList(QWidget* parent = nullptr);
     void AddProccess(int index);
+	void AddProccessList(
+		const std::vector<ProccessTemplate>& proccessList
+	);
     std::vector<ProccessTemplate> GetCurrentProccesses();
     void ClearProccesses();
 

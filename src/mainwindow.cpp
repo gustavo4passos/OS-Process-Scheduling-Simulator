@@ -77,6 +77,16 @@ void MainWindow::ActivateOrDeactivateRunButton(int numberOfProccesses)
 void MainWindow::Load()
 {
     QString filename = QFileDialog::getOpenFileName(this, "Select file");
+	if(filename == "") return;
+
+	std::string filenameString = filename.toUtf8().constData();
+	auto proccessList = ProccessListLoader::LoadProccessList(filenameString);
+
+	if(proccessList.size() > 0)
+	{
+		m_proccessList->ClearProccesses();
+		m_proccessList->AddProccessList(proccessList);
+	}
 }
 
 void MainWindow::Save()
@@ -88,7 +98,18 @@ void MainWindow::Save()
         tr("Proccess List File (*.plf)"));
 
     std::string filenameString = filename.toUtf8().constData();
-    
+	std::string extension = ".plf";
+
+	// LINUX might not add the .plf extension to the filename
+	// automatically. The verification below will concatenate
+	// .plf to the filename if necessary
+	if(filenameString.compare(
+		filenameString.length() - extension.length(), extension.length(),
+		extension) != 0)
+	{
+		filenameString += extension; 
+	}
+  	
     std::vector<ProccessTemplate> proccessList = m_proccessList->GetCurrentProccesses();
     ProccessListLoader::SaveProccessList(filenameString, proccessList);
 }
