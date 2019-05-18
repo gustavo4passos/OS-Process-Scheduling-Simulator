@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QtWidgets\QtWidgets>
+#include <QtWidgets/QtWidgets>
 #include "operatingsystem.h"
 
 class ProccessList;
@@ -16,6 +16,7 @@ private slots:
     void AddProccessBox();
     void ActivateOrDeactivateRunButton(int numberOfProccesses);
     void Load();
+    void Save();
 
 private:
     void CreateButtons();
@@ -36,6 +37,7 @@ private:
 
     QMenu* m_fileMenu;
     QAction* m_loadAction;
+    QAction* m_saveAction;
 
     QGroupBox* m_schedulerSettingsGroup;
     QBoxLayout* m_schedulerSettingsLayout;

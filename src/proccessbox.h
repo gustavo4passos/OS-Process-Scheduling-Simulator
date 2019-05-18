@@ -15,6 +15,9 @@ public:
     unsigned GetDuration();
     unsigned GetDeadline();
 
+	void SetArrivalTime(unsigned value);
+	void SetDuration(unsigned value);
+	void SetDeadline(unsigned deadline);
 
 private slots:
     void RemoveButtonClicked();

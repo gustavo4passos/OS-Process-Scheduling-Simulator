@@ -25,6 +25,38 @@ void ProccessList::AddProccess(int index)
     emit NumberOfProccessesChanged(m_numberOfProccesses);
 }
 
+void ProccessList::AddProccessList(
+	const std::vector<ProccessTemplate>& proccessList)
+{
+	for(auto proccess = proccessList.begin();
+		proccess != proccessList.end();
+		proccess++) 
+	{
+		ProccessBox* proccessBox = new ProccessBox(proccess->ID, this); 
+		proccessBox->SetArrivalTime(proccess->arrivalTime);
+		proccessBox->SetDuration(proccess->duration);
+		proccessBox->SetDeadline(proccess->deadline);
+
+		connect(proccessBox, &ProccessBox::RemoveProccessRequested,
+			this, &ProccessList::RemoveProccess);
+		m_mainLayout->insertWidget(m_numberOfProccesses, proccessBox, 
+			0, Qt::AlignLeft | Qt::AlignTop);
+
+		m_numberOfProccesses++;
+
+		emit NumberOfProccessesChanged(m_numberOfProccesses);
+	}
+}
+
+void ProccessList::ClearProccesses()
+{
+    for(int i = 0; i < m_mainLayout->count();)
+    {
+        QWidget* proccess = m_mainLayout->itemAt(i)->widget();
+        RemoveProccess(proccess);
+    }
+}
+
 std::vector<ProccessTemplate> ProccessList::GetCurrentProccesses()
 {
     std::vector<ProccessTemplate> proccessTemplates;
@@ -33,8 +65,8 @@ std::vector<ProccessTemplate> ProccessList::GetCurrentProccesses()
         ProccessBox* pWidget = static_cast<ProccessBox*>(m_mainLayout->itemAt(i)->widget());
         proccessTemplates.push_back({
             pWidget->GetID(),
-            pWidget->GetDuration(),
             pWidget->GetArrivalTime(),
+            pWidget->GetDuration(),
             pWidget->GetDeadline()
         });
     }

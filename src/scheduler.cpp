@@ -160,6 +160,7 @@ void Scheduler::RunRoundRobin(
         {
             MoveCurrentProccessToFinishedList(executionQueue, finishedProccesses);
             if(!executionQueue->empty()) m_currentProccessTimeLeft = m_quantum - 1;
+
             // There are no more proccesses in the execution queue
             else m_currentProccessTimeLeft = 0;
             return;
@@ -168,8 +169,7 @@ void Scheduler::RunRoundRobin(
         {
             m_currentProccessTimeLeft--;
             return;
-        }
-        
+        }  
     }
 }
 

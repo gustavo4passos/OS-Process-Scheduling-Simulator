@@ -32,8 +32,16 @@
 *.app
 
 # Executable folders
+bin/
 debug/
 release/
+
+# Objects folder
+build/
+
+# Qt script files
+object_script.os-scheduling-simulator.Debug
+object_script.os-scheduling-simulator.Release
 
 # vscode files
 .vscode/

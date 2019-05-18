@@ -9,6 +9,21 @@ ProccessBox::ProccessBox(unsigned proccessIndex, QWidget* parent)
     CreateMainLayout();
 }
 
+void ProccessBox::SetArrivalTime(unsigned value)
+{
+	m_arrivalTimeInput->setValue(value); 
+}
+
+void ProccessBox::SetDuration(unsigned value)
+{
+	m_durationInput->setValue(value);
+}
+
+void ProccessBox::SetDeadline(unsigned value)
+{
+	m_deadlineInput->setValue(value); 
+}
+
 void ProccessBox::CreateSpinBoxes()
 {
     m_arrivalTimeLabel = new QLabel(tr("Arrival Time"), this);
