@@ -6,12 +6,15 @@
 
 namespace ProccessListLoader 
 {
-    void SaveProccessList(
-        const std::string& filename, 
-        const std::vector<ProccessTemplate>& proccessList
-    );
+const char PLFFILEHEADER[14] = "PLFFILEHEADER";
+const unsigned SIZEOFPLFFILEHEADER = 14;
 
-    std::vector<ProccessTemplate> LoadProccessList(const std::string& filename);
+void SaveProccessList(
+    const std::string& filename, 
+    const std::vector<ProccessTemplate>& proccessList
+);
+
+std::vector<ProccessTemplate> LoadProccessList(const std::string& filename);
 }
 
 #endif

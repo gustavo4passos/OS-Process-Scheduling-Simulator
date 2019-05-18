@@ -1,5 +1,6 @@
 #include "proccesslistloader.h"
 #include <fstream>
+#include <string.h>
 
 namespace ProccessListLoader
 {
@@ -15,6 +16,9 @@ void SaveProccessList(
 
 	if(!file.is_open()) return;
 
+	// Write header
+	file.write((const char*)&PLFFILEHEADER[0], SIZEOFPLFFILEHEADER);
+
 	for(auto proccess = proccessList.begin();
 		proccess != proccessList.end();
 		proccess++)
@@ -28,12 +32,21 @@ void SaveProccessList(
 	file.close();
 }
 
+
 std::vector<ProccessTemplate> LoadProccessList(const std::string& filename)
 {
 	std::vector<ProccessTemplate> proccessList;
 	std::fstream file;
 	file.open(filename, std::fstream::binary | std::fstream::in);
 	if(!file.is_open()) return proccessList; 
+
+	// Check header
+	char header[SIZEOFPLFFILEHEADER];
+	file.read((char*)header, SIZEOFPLFFILEHEADER);
+	if(strcmp(header, PLFFILEHEADER) != 0)
+	{
+		return proccessList;
+	}
 
 	// For each field, read from the file and check if the stream
 	// is still good

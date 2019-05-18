@@ -76,7 +76,7 @@ void MainWindow::ActivateOrDeactivateRunButton(int numberOfProccesses)
 
 void MainWindow::Load()
 {
-    QString filename = QFileDialog::getOpenFileName(this, "Select file");
+    QString filename = QFileDialog::getOpenFileName(this, tr("Select file"), QString(), tr("Proccess List Files (*.plf)"));
 	if(filename == "") return;
 
 	std::string filenameString = filename.toUtf8().constData();
@@ -87,6 +87,10 @@ void MainWindow::Load()
 		m_proccessList->ClearProccesses();
 		m_proccessList->AddProccessList(proccessList);
 	}
+    else
+    {
+        QMessageBox::warning(this, tr("Warning"), tr("Invalid proccess list file."), QMessageBox::StandardButton::Ok);
+    }
 }
 
 void MainWindow::Save()
