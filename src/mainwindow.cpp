@@ -267,6 +267,7 @@ void MainWindow::ConnectWidgets()
     connect(m_runButton, &QPushButton::clicked, this, &MainWindow::RunSimulation);
 }
 
+#include <iostream>
 void MainWindow::RunSimulation()
 {
     OperatingSystem os = OperatingSystem(m_quantumValueSelector->value(),
@@ -278,6 +279,7 @@ void MainWindow::RunSimulation()
         pTemplate != proccesses.end();
         pTemplate++)
     {
+        std::cout << "Arrival time: " << pTemplate->arrivalTime << std::endl;
         os.AddProccess(
             pTemplate->ID, 
             pTemplate->arrivalTime, 

@@ -65,8 +65,8 @@ std::vector<ProccessTemplate> ProccessList::GetCurrentProccesses()
         ProccessBox* pWidget = static_cast<ProccessBox*>(m_mainLayout->itemAt(i)->widget());
         proccessTemplates.push_back({
             pWidget->GetID(),
-            pWidget->GetDuration(),
             pWidget->GetArrivalTime(),
+            pWidget->GetDuration(),
             pWidget->GetDeadline()
         });
     }
