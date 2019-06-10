@@ -35,6 +35,7 @@ public:
     void ProtectPages(const std::vector<unsigned>& pages);
     void RemoveProtectionFromPages(const std::vector<unsigned>& pages);
     void DeletePages(const std::vector<unsigned>& pages);
+    void ReferencePages(const std::vector<unsigned>& pages);
     
     unsigned GetNumberOfFreeRamPages() { return m_freeRamPages.size(); }
     const std::vector<int>& GetRAM() const { return RAM; }

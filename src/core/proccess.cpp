@@ -25,7 +25,7 @@ void Proccess::Run(int currentTime)
     if(m_state == ProccessState::DONE) return;
 
     // If proccess is currently idle, change its state
-    if(m_state == ProccessState::READY)
+    if(m_state == ProccessState::READY || m_state == ProccessState::BLOCKED)
     {
         m_state = ProccessState::RUNNING;
     }

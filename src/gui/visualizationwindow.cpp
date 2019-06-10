@@ -97,10 +97,14 @@ void VisualizationWindow::CreateTimeline()
     m_timeline = new QTableWidget(m_os->GetNumberOfProccesses(),
         INITIALCOLUMNNUMBER, this);
 
+    m_RAMView = new QTableWidget(
+        m_os->GetMemoryManager()->GetRAM().size(), 1, this);
+
     unsigned time = 0;
     while(m_os->NextStep())
     {
         std::vector<Proccess*> proccesses = m_os->GetActiveProccesses();
+        std::vector<Proccess*> blockedProccesses = m_os->GetBlockedProcesses();
         for(unsigned i = 0; i < proccesses.size(); i++)
         {
             if(proccesses[i]->GetState() == ProccessState::RUNNING ||
@@ -130,20 +134,39 @@ void VisualizationWindow::CreateTimeline()
                 newItem->setBackgroundColor(Qt::black);
                 m_timeline->setItem(proccesses[i]->GetID() - 1, time, newItem);
             }
+            else if(proccesses[i]->GetState() == ProccessState::IO)
+            {
+                QTableWidgetItem* newItem = new QTableWidgetItem();
+                newItem->setBackgroundColor(Qt::blue);
+                m_timeline->setItem(proccesses[i]->GetID() - 1, time, newItem);
+            }
         }
+
+        for(auto& proccess : blockedProccesses)
+        {
+            QTableWidgetItem* newItem = new QTableWidgetItem();
+            if(proccess->GetState() == ProccessState::IO)
+            {
+                newItem->setBackgroundColor(Qt::blue);
+            }
+            else newItem->setBackgroundColor(Qt::black);
+            m_timeline->setItem(proccess->GetID() - 1, time, newItem);
+        }
+
+        for(int i = 0; i < 50; i++)
+        {
+            QTableWidgetItem* newItem = new QTableWidgetItem(tr("%1").arg(
+                m_os->GetMemoryManager()->GetRAM()[i]
+            ));
+            m_RAMView->setItem(i, time, newItem);
+        }
+        m_RAMView->insertColumn(m_RAMView->columnCount());
         time++;
     }
 
-    m_RAMView = new QTableWidget(
-        m_os->GetMemoryManager()->GetRAM().size(), 1, this);
+    
 
-    for(int i = 0; i < 50; i++)
-    {
-        QTableWidgetItem* newItem = new QTableWidgetItem(tr("%1").arg(
-            m_os->GetMemoryManager()->GetRAM()[i]
-        ));
-        m_RAMView->setItem(i, 0, newItem);
-    }
+    
 
     for(int i = 0; i < m_timeline->columnCount(); i++)
     {

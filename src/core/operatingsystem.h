@@ -30,6 +30,7 @@ public:
 
     const std::vector<Proccess*>& GetFinishedProccesses() const { return m_finishedProccesses; }
     const std::vector<Proccess*>& GetActiveProccesses()   const { return m_executionQueue;     }
+    const std::vector<Proccess*>& GetBlockedProcesses() const { return m_blockedProcesses; }
 
     // Add a proccess to the proccess list.
     void AddProccess(

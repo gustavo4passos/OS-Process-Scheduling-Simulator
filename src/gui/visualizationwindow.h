@@ -32,5 +32,5 @@ private:
     QGraphicsScene* m_scene;
     QGraphicsView* m_view;
 
-    const static unsigned INITIALCOLUMNNUMBER = 60;
+    const static unsigned INITIALCOLUMNNUMBER = 120;
 };

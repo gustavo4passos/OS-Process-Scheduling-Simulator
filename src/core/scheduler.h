@@ -50,7 +50,18 @@ public:
     void SetSchedulingAlgorithm(
         SchedulingAlgorithm shedulingAlgorithm,
         std::vector<Proccess*>* executionQueue
-        );
+    );
+
+    void DoIO(
+        std::vector<Proccess*>* executionQueue, 
+        std::vector<Proccess*>* blockedProccesses,
+        MemoryManager* memoryManager
+    );
+
+    void BlockProcess(
+        Proccess* proccess, 
+        std::vector<Proccess*>* blockedProccesses
+    );
 
 private:
     unsigned m_quantum;
@@ -104,6 +115,14 @@ private:
     void MoveProccessWithEarliestDeadline(
         std::vector<Proccess*>* executionQueue
     );
+
+    void FindNextProccessWithPagesInMemory(
+        std::vector<Proccess*>* executionQueue,
+        std::vector<Proccess*>* blockedProccesses,
+        MemoryManager* memoryManager
+    );
+
+    void UnblockProccessesInExecutionQueue(std::vector<Proccess*>* executionQueue);
 };
 
 #endif

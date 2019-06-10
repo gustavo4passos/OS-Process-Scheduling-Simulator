@@ -9,6 +9,7 @@ enum class ProccessState
   RUNNING,
   OVERHEAD,
   BLOCKED,
+  IO,
   DONE
 };
 

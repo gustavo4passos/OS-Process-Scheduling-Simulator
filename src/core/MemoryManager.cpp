@@ -32,7 +32,7 @@ bool MemoryManager::AreAllPagesInMemory(
 
     return true;
 }
-
+#include <iostream>
 int MemoryManager::LoadAbsentPagesToMemory(
     const std::vector<unsigned>& pages)
 {
@@ -58,12 +58,15 @@ int MemoryManager::LoadAbsentPagesToMemory(
     {  
         int freePage = -1;
 
+        int leastRecentlyUsedPage;
         // If there are free pages in RAM, load absent page there
         if(m_freeRamPages.size() == 0)
         {
             if(m_pageReplacementAlgorithm == PageReplacementAlgorithm::LRU)
             {
-                freePage = GetLeastRecentlyUsedPage();
+                leastRecentlyUsedPage = GetLeastRecentlyUsedPage();
+                freePage = m_pageTable[leastRecentlyUsedPage].pageFrameNumber;
+                DeletePage(leastRecentlyUsedPage);
             }
             else // FIFO
             {
@@ -73,11 +76,20 @@ int MemoryManager::LoadAbsentPagesToMemory(
             }
         }
 
+        #ifdef M_DEBUG
+        if(m_freeRamPages.empty())
+        {
+            std::cout << "Time: " << m_counter << " freePage " << freePage << std::endl;
+            std::cout << "Least recently used " << leastRecentlyUsedPage << std::endl;
+        }
+        assert(!m_freeRamPages.empty());
+        #endif
+        
         freePage = m_freeRamPages.front();
         m_freeRamPages.pop();
 
         #ifdef M_DEBUG
-        assert(freePage >= 0);
+        assert(freePage >= 0 && freePage < RAM.size());
         #endif
 
         LoadPage(p, freePage);
@@ -137,6 +149,14 @@ void MemoryManager::DeletePages(const std::vector<unsigned>& pages)
     }
 }
 
+void MemoryManager::ReferencePages(const std::vector<unsigned>& pages)
+{
+    for(auto& p : pages)
+    {
+        m_pageTable[p].lastReferenceTime = m_counter;
+    }
+}
+
 void MemoryManager::LoadPage(unsigned page, unsigned ramPage)
 {
     #ifdef M_DEBUG
@@ -179,7 +199,7 @@ void MemoryManager::ProtectPage(int page)
     assert((unsigned)page < m_pageTable.size());
     #endif
 
-    m_pageTable[page].protection = false;
+    m_pageTable[page].protection = true;
 }
 
 void MemoryManager::UnprotectPage(int page)
@@ -188,7 +208,7 @@ void MemoryManager::UnprotectPage(int page)
     assert((unsigned)page < m_pageTable.size());
     #endif
 
-    m_pageTable[page].protection = true;
+    m_pageTable[page].protection = false;
 }
 
 
@@ -232,17 +252,37 @@ int MemoryManager::GetOldestPage()
     return oldestPage;
 }
 
+#include <iostream>
 int MemoryManager::GetLeastRecentlyUsedPage()
 {
-    int oldestPage = 0;
 
+    int oldestPage = -1;
+
+    // Find the first present page
     for(int i = 0; i < m_pageTable.size(); i++)
     {
-        if(m_pageTable[i].lastReferenceTime < m_pageTable[i].lastReferenceTime &&
+        if(m_pageTable[i].present)
+        {
+            oldestPage = i;
+            break;
+        }
+    }
+
+    #ifdef M_DEBUG
+    // Asserts at least one page was found
+    assert(oldestPage != -1);
+    #endif
+   
+    for(int i = 0; i < m_pageTable.size(); i++)
+    {
+     
+        if(m_pageTable[i].lastReferenceTime < m_pageTable[oldestPage].lastReferenceTime &&
            m_pageTable[i].present)
         {
+       
             oldestPage = i;
         }
     }
+
     return oldestPage;
 }

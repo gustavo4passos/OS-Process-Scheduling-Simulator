@@ -84,6 +84,46 @@ void Scheduler::SetSchedulingAlgorithm(
     }
 }
 
+void Scheduler::DoIO(
+    std::vector<Proccess*>* executionQueue, 
+    std::vector<Proccess*>* blockedProccesses,
+    MemoryManager* memoryManager)
+{
+    if(blockedProccesses->empty()) return;
+
+    Proccess* proccess = blockedProccesses->front();
+    proccess->SetState(ProccessState::IO);
+    memoryManager->LoadAbsentPagesToMemory(proccess->GetPages());
+
+    if(memoryManager->AreAllPagesInMemory(proccess->GetPages()))
+    {
+        // If proccess is done loading, remove if from the blocked list
+        blockedProccesses->erase(blockedProccesses->begin());
+
+        if(m_algorithm == SchedulingAlgorithm::FIFO)
+        {
+            // And insert it at the begining of the execution queue
+            executionQueue->insert(executionQueue->begin(), proccess);
+        }
+        else
+        {
+            executionQueue->push_back(proccess);
+        }
+    }
+}
+
+void Scheduler::BlockProcess(
+    Proccess* proccess,
+    std::vector<Proccess*>* blockedProccesses)
+{
+    #ifdef M_DEBUG
+    assert(proccess != nullptr);
+    #endif
+
+    proccess->SetState(ProccessState::BLOCKED);
+    blockedProccesses->push_back(proccess);
+}
+
 void Scheduler::RunFIFO(
     std::vector<Proccess*>* executionQueue,
     std::vector<Proccess*>* finishedProccesses,
@@ -100,6 +140,7 @@ void Scheduler::RunFIFO(
 
     if(executionQueue->empty() && blockedProcesses->empty()) return;
 
+    // Current process has finished running
     if(executionQueue->front()->GetState() == ProccessState::DONE)
     {
         // Remove proccess pages from RAM
@@ -107,23 +148,28 @@ void Scheduler::RunFIFO(
         MoveCurrentProccessToFinishedList(executionQueue, finishedProccesses);
     }
 
-    if(!executionQueue->empty())
+    if(!executionQueue->empty() && blockedProcesses->empty())
     {
         Proccess* currentProccess = executionQueue->front();
 
         // Check if current proccess has all pages in memory
-        if(memoryManager->AreAllPagesInMemory(currentProccess->GetPages()))
+        if(!memoryManager->AreAllPagesInMemory(currentProccess->GetPages()))
+        {
+            BlockProcess(currentProccess, blockedProcesses);
+            executionQueue->erase(executionQueue->begin());
+        }
+        else
         {
             if(currentProccess->GetState() == ProccessState::BLOCKED)
-                currentProccess->SetState(ProccessState::RUNNING);
-
-            executionQueue->front()->Run(time);
+            {
+                currentProccess->SetState(ProccessState::READY);
+            }
+            currentProccess->Run(time);
         }
-        else // If not, load as many pages as it's possible in one cicle
-        {
-            currentProccess->SetState(ProccessState::BLOCKED);
-            memoryManager->LoadAbsentPagesToMemory(currentProccess->GetPages());
-        }
+    }
+    if(!blockedProcesses->empty())
+    {
+        DoIO(executionQueue, blockedProcesses, memoryManager); 
     }
 }
 
@@ -149,6 +195,7 @@ void Scheduler::RunSJF(
     // the finished proccesses list.
     if(executionQueue->front()->GetState() == ProccessState::DONE)
     {
+        memoryManager->DeletePages(executionQueue->front()->GetPages());
         MoveCurrentProccessToFinishedList(executionQueue, finishedProccesses);
         // If there are no more proccesses to be run,
         // return.
@@ -194,7 +241,9 @@ void Scheduler::RunRoundRobin(
            blockedProcesses   != nullptr &&
            memoryManager      != nullptr);
     #endif
-    if(executionQueue->empty()) return;
+    if(executionQueue->empty() && blockedProcesses->empty()) return;
+
+    UnblockProccessesInExecutionQueue(executionQueue);
 
     // Current proccess has used all it's available quantum
     // OR the first proccess is about to start.
@@ -203,24 +252,42 @@ void Scheduler::RunRoundRobin(
         // Execution is about to start
         if(executionQueue->front()->GetState() == ProccessState::READY)
         {
-            m_currentProccessTimeLeft = m_quantum - 1;
-            memoryManager->ProtectPages(executionQueue->front()->GetPages());
+            FindNextProccessWithPagesInMemory(
+                executionQueue, 
+                blockedProcesses, 
+                memoryManager);
+            
+            if(!executionQueue->empty()) m_currentProccessTimeLeft = m_quantum - 1;
         }
         // Current proccess has finished executing
         else if(executionQueue->front()->GetState() == ProccessState::DONE)
         {
             // Clear the pages of the current process from memory
-            memoryManager->ClearPagesFromMemory(executionQueue->front()->GetPages());
+            memoryManager->DeletePages(executionQueue->front()->GetPages());
             MoveCurrentProccessToFinishedList(executionQueue, finishedProccesses);
             
-            if(!executionQueue->empty()) m_currentProccessTimeLeft = m_quantum - 1;
+            if(!executionQueue->empty()) 
+            {
+                FindNextProccessWithPagesInMemory(
+                executionQueue, 
+                blockedProcesses, 
+                memoryManager);
+
+                if(!executionQueue->empty())
+                {
+                    // Restarts quantum
+                    m_currentProccessTimeLeft = m_quantum - 1;
+                }
+            }
         }
+        // The process is still running, but has already used all it's available
+        // quantum, so context change will start (overhead)
         else if(executionQueue->front()->GetState() == ProccessState::RUNNING)
         {
             executionQueue->front()->SetState(ProccessState::OVERHEAD);
             m_overheadTimeLeft = m_overhead - 1;
         }
-        // Proccess state is being saved (overhead)
+        // Proccess state is being saved (context change)
         else
         {
             if(m_overheadTimeLeft > 0)
@@ -231,23 +298,53 @@ void Scheduler::RunRoundRobin(
             {
                 m_overheadTimeLeft = 0;
                 executionQueue->front()->SetState(ProccessState::READY);
+
+                // There are other processes to be executed
                 if(executionQueue->size() > 1)
                 {
+                    // Unprotect process pages before next process runs
+                    memoryManager->RemoveProtectionFromPages(
+                        executionQueue->front()->GetPages());
                     MoveCurrentProccessToEndOfQueue(executionQueue);
+
+                    FindNextProccessWithPagesInMemory(
+                        executionQueue, 
+                        blockedProcesses, 
+                        memoryManager);
                 }
-                m_currentProccessTimeLeft = m_quantum - 1;
+
+                if(!executionQueue->empty())
+                {
+                    // Reset quantum
+                    m_currentProccessTimeLeft = m_quantum - 1;
+                }
             }
         }
     }
-    else 
+    else // The current running process still have quantum left to use
     {
+        // The processed finished running before using it's available quantum
         if(executionQueue->front()->GetState() == ProccessState::DONE)
         {
+            // Clear proccess pages from memory, as it is done running
+            memoryManager->DeletePages(executionQueue->front()->GetPages());
             MoveCurrentProccessToFinishedList(executionQueue, finishedProccesses);
-            if(!executionQueue->empty()) m_currentProccessTimeLeft = m_quantum - 1;
 
-            // There are no more proccesses in the execution queue
-            else m_currentProccessTimeLeft = 0;
+            // If there are still proccesses to run that are not blocked
+            if(!executionQueue->empty()) 
+            {
+                FindNextProccessWithPagesInMemory(
+                    executionQueue, 
+                    blockedProcesses, 
+                    memoryManager);
+
+                // If an available proccess was found
+                if(!executionQueue->empty())
+                {
+                    m_currentProccessTimeLeft = m_quantum - 1;
+                }
+            }
+            else m_currentProccessTimeLeft = 0; 
         }
         else
         {
@@ -255,24 +352,32 @@ void Scheduler::RunRoundRobin(
         }  
     }
 
-    if(executionQueue->size() > 0) executionQueue->front()->Run(time);
+    if(executionQueue->size() > 0) 
+    {
+        executionQueue->front()->Run(time); 
+        // Mark the proccess pages as referenced
+        memoryManager->ReferencePages(executionQueue->front()->GetPages());
+    }
+    DoIO(executionQueue, blockedProcesses, memoryManager);
 }
 
 void Scheduler::RunEDF(
     std::vector<Proccess*>* executionQueue,
     std::vector<Proccess*>* finishedProccesses,
-    std::vector<Proccess*>* blockedProcesses,
+    std::vector<Proccess*>* blockedProccesses,
     MemoryManager* memoryManager,
     unsigned time)
 {
     #ifdef M_DEBUG
     assert(executionQueue     != nullptr &&
            finishedProccesses != nullptr &&
-           blockedProcesses   != nullptr &&
+           blockedProccesses   != nullptr &&
            memoryManager      != nullptr);
     #endif
 
-    if(executionQueue->empty()) return;
+    UnblockProccessesInExecutionQueue(executionQueue);
+
+    if(executionQueue->empty() && blockedProccesses->empty()) return;
 
     // Current proccess has used all it's available quantum
     // OR the first proccess is about to start.
@@ -281,16 +386,31 @@ void Scheduler::RunEDF(
         // Execution is about to start
         if(executionQueue->front()->GetState() == ProccessState::READY)
         {
-            MoveProccessWithEarliestDeadline(executionQueue);
-            m_currentProccessTimeLeft = m_quantum - 1;
-        }
-        else if(executionQueue->front()->GetState() == ProccessState::DONE)
-        {
-            MoveCurrentProccessToFinishedList(executionQueue, finishedProccesses);
-            if(!executionQueue->empty()) 
+            FindNextProccessWithPagesInMemory(
+                executionQueue,
+                blockedProccesses,
+                memoryManager);
+            // If there are any processes available to run, restart quantum
+            if(!executionQueue->empty())
             {
                 m_currentProccessTimeLeft = m_quantum - 1;
-                MoveProccessWithEarliestDeadline(executionQueue);
+            }
+        } 
+        // Currrent proccess has finished executing
+        else if(executionQueue->front()->GetState() == ProccessState::DONE)
+        {
+            memoryManager->DeletePages(executionQueue->front()->GetPages());
+            MoveCurrentProccessToFinishedList(executionQueue, finishedProccesses);
+
+            FindNextProccessWithPagesInMemory(
+                executionQueue,
+                blockedProccesses,
+                memoryManager);
+
+            // If there are any processes available to run, restart quantum
+            if(!executionQueue->empty())
+            {
+                m_currentProccessTimeLeft = m_quantum - 1;
             }
         }
         else if(executionQueue->front()->GetState() == ProccessState::RUNNING)
@@ -307,13 +427,28 @@ void Scheduler::RunEDF(
             }
             else
             {
+                // Context saving has finished, change current proccess
+                // state from running to ready
                 m_overheadTimeLeft = 0;
                 executionQueue->front()->SetState(ProccessState::READY);
+
+                // If there are more proccesses in the execution
+                // list, unprotect the pages from the current
+                // proccess and find the next proccess to run
                 if(executionQueue->size() > 1)
                 {
-                    MoveProccessWithEarliestDeadline(executionQueue);
+                    memoryManager->RemoveProtectionFromPages(
+                        executionQueue->front()->GetPages());
+                    FindNextProccessWithPagesInMemory(
+                        executionQueue,
+                        blockedProccesses,
+                        memoryManager);
                 }
-                m_currentProccessTimeLeft = m_quantum - 1;
+                // If there are any processes available to run, restart quantum
+                if(!executionQueue->empty())
+                {
+                    m_currentProccessTimeLeft = m_quantum - 1;
+                }
             }
         }
     }
@@ -321,10 +456,17 @@ void Scheduler::RunEDF(
     {
         if(executionQueue->front()->GetState() == ProccessState::DONE)
         {
+            memoryManager->DeletePages(executionQueue->front()->GetPages());
             MoveCurrentProccessToFinishedList(executionQueue, finishedProccesses);
+
+            FindNextProccessWithPagesInMemory(
+                executionQueue,
+                blockedProccesses,
+                memoryManager);
+
+            // If there are any processes available to run, restart quantum
             if(!executionQueue->empty())
             {
-                MoveProccessWithEarliestDeadline(executionQueue);
                 m_currentProccessTimeLeft = m_quantum - 1;
             }
             // There are no more proccesses in the execution queue
@@ -337,7 +479,12 @@ void Scheduler::RunEDF(
     }
 
     if(!executionQueue->empty())
+    {
         executionQueue->front()->Run(time);
+        // Mark the proccess pages as referenced
+        memoryManager->ReferencePages(executionQueue->front()->GetPages());
+    }
+    DoIO(executionQueue, blockedProccesses, memoryManager);
 }
 
 void Scheduler::MoveShortestJobToTheFront(std::vector<Proccess*>* executionQueue)
@@ -445,5 +592,55 @@ void Scheduler::MoveProccessWithEarliestDeadline(std::vector<Proccess*>* executi
             (*executionQueue)[0] = earliestDeadlProcc;
             (*earliestDeadlProccIt) = currentFirstProccess;
         }        
+    }
+}
+
+void Scheduler::FindNextProccessWithPagesInMemory(
+    std::vector<Proccess*>* executionQueue,
+        std::vector<Proccess*>* blockedProccesses,
+        MemoryManager* memoryManager)
+{
+    while(!executionQueue->empty())
+    {
+        Proccess* proccess;
+        // Choose next possible proccess using the current algorithm
+        if(m_algorithm == SchedulingAlgorithm::ROUND_ROBIN)
+        {
+            proccess = executionQueue->front();
+        }
+        else if(m_algorithm == SchedulingAlgorithm::EDF)
+        {
+            MoveProccessWithEarliestDeadline(executionQueue);
+            proccess = executionQueue->front();
+        }
+        else assert(false);
+
+        // Proccess can run
+        if(memoryManager->AreAllPagesInMemory(proccess->GetPages()))
+        {
+            // Protect current proccess pages
+            memoryManager->ProtectPages(executionQueue->front()->GetPages());
+            break;
+        }
+        else
+        {
+            // Not all pages from current proccesses are in memory,
+            // Block it.
+            BlockProcess(proccess, blockedProccesses);
+            executionQueue->erase(executionQueue->begin());
+        } 
+    }
+}
+
+void Scheduler::
+    UnblockProccessesInExecutionQueue(std::vector<Proccess*>* executionQueue)
+{
+    for(auto& proccess : *executionQueue)
+    {
+        if(proccess->GetState() == ProccessState::BLOCKED ||
+           proccess->GetState() == ProccessState::IO)
+        {
+            proccess->SetState(ProccessState::READY);
+        }
     }
 }

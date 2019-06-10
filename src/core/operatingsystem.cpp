@@ -114,7 +114,7 @@ bool OperatingSystem::NextStep()
     // because it's possible that the execution queue
     // is empty (no active proccesses at the moment),
     // but proccesses will arrive later.
-    if(m_executionQueue.size() > 0)
+    if(!m_executionQueue.empty() || !m_blockedProcesses.empty())
     {
         m_scheduler->Run(
             &m_executionQueue, 
