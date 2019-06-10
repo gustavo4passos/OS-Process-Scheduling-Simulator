@@ -73,7 +73,7 @@ void VisualizationWindow::RunStep()
             for(int i = 0; i < columnCount; i++)
             {
                 m_timeline->insertColumn(m_timeline->columnCount());
-                m_timeline->setColumnWidth(columnCount + i, 2);
+                m_timeline->setColumnWidth(columnCount + i, TIMELINECOLUMNWIDTH);
             }
         }
 
@@ -104,12 +104,6 @@ void VisualizationWindow::RunStep()
                 m_timeline->setItem(proccesses[i]->GetID() - 1, m_time, newItem);
                 m_timeline->scrollToItem(newItem);
             }
-            // else if(proccesses[i]->GetState() == ProccessState::BLOCKED)
-            // {
-            //     QTableWidgetItem* newItem = new QTableWidgetItem();
-            //     newItem->setBackgroundColor(Qt::black);
-            //     m_timeline->setItem(proccesses[i]->GetID() - 1, time, newItem);
-            // }
             else if(proccesses[i]->GetState() == ProccessState::IO)
             {
                 QTableWidgetItem* newItem = new QTableWidgetItem();
@@ -211,7 +205,7 @@ void VisualizationWindow::CreateTimeline()
 
     for(int i = 0; i < m_timeline->columnCount(); i++)
     {
-        m_timeline->setColumnWidth(i, 2);
+        m_timeline->setColumnWidth(i, TIMELINECOLUMNWIDTH);
     }
 
    
