@@ -25,6 +25,7 @@ public:
     );
 
     inline unsigned GetID()          const { return m_ID;                       }
+    inline void     SetID(unsigned ID)     { m_ID = ID;                         }
     inline unsigned GetArrivalTime() const { return m_arrivalTime;              }
     inline unsigned GetDuration()    const { return m_duration;                 }
     inline unsigned GetTimeLeft()    const { return m_timeLeft;                 }

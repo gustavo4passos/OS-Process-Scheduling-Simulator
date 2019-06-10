@@ -138,6 +138,8 @@ void Scheduler::RunFIFO(
            memoryManager      != nullptr);
     #endif
 
+    UnblockProccessesInExecutionQueue(executionQueue);
+
     if(executionQueue->empty() && blockedProcesses->empty()) return;
 
     // Current process has finished running
@@ -214,7 +216,7 @@ void Scheduler::RunSJF(
     
     if(memoryManager->AreAllPagesInMemory(currentProccess->GetPages()))
     {
-        if(currentProccess->GetState() == ProccessState::BLOCKED)
+        if(currentProccess->GetState() == ProccessState::IO)
         {
             currentProccess->SetState(ProccessState::RUNNING);
         }
@@ -222,7 +224,7 @@ void Scheduler::RunSJF(
     }
     else
     {
-        currentProccess->SetState(ProccessState::BLOCKED);
+        currentProccess->SetState(ProccessState::IO);
         memoryManager->LoadAbsentPagesToMemory(currentProccess->GetPages());
     }
     

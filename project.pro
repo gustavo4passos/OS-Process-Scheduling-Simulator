@@ -8,6 +8,7 @@ HEADERS += src/gui/proccesslistloader.h
 HEADERS += src/gui/visualizationwindow.h
 HEADERS += src/core/memory.h
 HEADERS += src/core/memorymanager.h
+HEADERS += src/gui/rect.hpp
 
 SOURCES += src/core/main.cpp
 SOURCES += src/gui/mainwindow.cpp

@@ -38,6 +38,11 @@ public:
     void ReferencePages(const std::vector<unsigned>& pages);
     
     unsigned GetNumberOfFreeRamPages() { return m_freeRamPages.size(); }
+    PageReplacementAlgorithm GetPageReplacementAlgorithm() const
+    { 
+        return m_pageReplacementAlgorithm; 
+    }
+    
     const std::vector<int>& GetRAM() const { return RAM; }
 
     // Increase counter by 1

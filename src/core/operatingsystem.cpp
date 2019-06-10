@@ -90,6 +90,9 @@ void OperatingSystem::AddProccess(
 {
     m_proccesses.push_back(
         new Proccess(id, arrivalTime, duration, deadline, numberOfPages));
+    
+    // Set ID, so proccesses IDs have no gaps
+    m_proccesses.back()->SetID(m_proccesses.size());
     m_numberOfProccesses++;
 }
 

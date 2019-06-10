@@ -42,6 +42,7 @@ MainWindow::MainWindow()
 
     statusBar()->setSizeGripEnabled(false);
     setWindowFlags(Qt::Window | Qt::MSWindowsFixedSizeDialogHint);
+    setWindowTitle("OS Scheduling Simulator");
 }
 
 void MainWindow::AddProccessBox()
