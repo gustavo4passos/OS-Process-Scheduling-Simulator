@@ -35,60 +35,7 @@ VisualizationWindow::VisualizationWindow(
     CreateLeftsideLayout();
     CreateMainLayout();
 
-//     QGraphicsRectItem* r = new QGraphicsRectItem(0, 0, 0, 50);
-//     QGraphicsRectItem* n = new QGraphicsRectItem(50, 50, 50, 50);
-
-//     r->setBrush(QBrush(Qt::black));
-//     n->setBrush(QBrush(Qt::green));
-
-//     QTimeLine* timeline = new QTimeLine(5000, this);
-//     timeline->setFrameRange(0, 100);
-
-//     QGraphicsItemAnimation* animation = new QGraphicsItemAnimation;
-//     QGraphicsItemAnimation* a = new QGraphicsItemAnimation;
-
-//     animation->setItem(r);
-//     a->setItem(n);
-
-//     animation->setTimeLine(timeline);
-//     a->setTimeLine(timeline);
-
-//     // animation->setPosAt(0.2f, QPointF(10, 10));
-//     // animation->setPosAt(1.f, QPointF(960, 544));
-//     animation->setScaleAt(.1f, 100.f, 1.f);
-//     // a->setPosAt(.2f, QPointF(50.f, 0.f));
-//     a->setScaleAt(.0f, 0.f, 0.f);
-//     a->setScaleAt(.1f, 1.f, 1.f);
-
-//     m_scene = new QGraphicsScene(this);
-//     m_scene->setSceneRect(0, 0, 960, 544);
-
-// #if FALSE
-//     for(int i = 0; i < 1920; i += 50)
-//     {
-//         m_scene->addLine(i, 0, i, 1080, QPen(Qt::red));
-//     }
-//     for(int i = 0; i < 1080; i+= 50)
-//     {
-//         m_scene->addLine(0, i, 1920, i);
-//     }
-// #endif
-
-// #ifdef FALSE
-//     QBrush brush = QBrush();
-//     brush.setColor(Qt::blue);
-//     m_scene->setBackgroundBrush(brush);
-// #endif
-
-//     // m_scene->addItem(r);
-//     m_scene->addItem(n);
-// 
-    // m_view = new QGraphicsView(m_scene);
-    // m_view->show();
-
     setCentralWidget(m_mainWidget);
-
-    // timeline->start();
 
     m_playTimer = new QTimer(this);
     
@@ -96,10 +43,23 @@ VisualizationWindow::VisualizationWindow(
 
     m_playTimer->start(m_stepDelayMs / m_simulationSpeedSlider->value());
     m_isPlaying = true;
+
+    setWindowTitle(tr("Simulation"));
 }
+
 VisualizationWindow::~VisualizationWindow()
 {
     delete m_os;
+}
+
+void VisualizationWindow::paintEvent(QPaintEvent* pe)
+{
+    QMainWindow::paintEvent(pe);
+
+    QPainter painter(this);
+    painter.drawText(
+        QPointF(m_timeline->rect().right() / 2.f, 15.f), 
+        tr("Timeline"));
 }
 
 void VisualizationWindow::RunStep()
@@ -176,7 +136,8 @@ void VisualizationWindow::RunStep()
             QString cellText;
             int ramPage = m_os->GetMemoryManager()->GetRAM()[i];
             if(ramPage == -1) cellText = tr("free");
-            else cellText = tr("%1").arg(ramPage);
+            else cellText = tr("%1 (P%2)").arg(
+                ramPage).arg(m_os->WhichProccessOwnsThisPage(ramPage));
 
             QTableWidgetItem* newItem = new QTableWidgetItem(cellText);
             m_RAMView->setItem(i, 0, newItem);
@@ -224,14 +185,29 @@ void VisualizationWindow::NextStep()
 void VisualizationWindow::CreateTimeline()
 {
     if(m_timeline != nullptr) delete m_timeline;
+
     m_timeline = new QTableWidget(m_os->GetNumberOfProccesses(),
         INITIALCOLUMNNUMBER, this);
 
+    // Make table non-selectable and non-editable
+    m_timeline->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_timeline->setFocusPolicy(Qt::NoFocus);
+    m_timeline->setSelectionMode(QAbstractItemView::NoSelection);
+
+    for(unsigned i = 1; i <= m_os->GetNumberOfProccesses(); i++)
+    {
+        QTableWidgetItem* header = new QTableWidgetItem(tr("P%1").arg(i));
+        m_timeline->setVerticalHeaderItem(i - 1, header);
+    }
+
     m_RAMView = new QTableWidget(
         m_os->GetMemoryManager()->GetRAM().size(), 1, this);
-
+    // Make table non-selectable and non-editable
+    m_RAMView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    m_RAMView->setFocusPolicy(Qt::NoFocus);
+    m_RAMView->setSelectionMode(QAbstractItemView::NoSelection);
     m_RAMView->setMaximumWidth(150);
-    m_RAMView->setHorizontalHeaderLabels(QStringList() << "RAM");
+    m_RAMView->setHorizontalHeaderLabels(QStringList() << "RAM/ Owner");
 
     for(int i = 0; i < m_timeline->columnCount(); i++)
     {
@@ -363,8 +339,10 @@ void VisualizationWindow::CreateLegend()
     Rect* runningLegend = new Rect(this, Qt::green, 15);
     QLabel* overhead = new QLabel(tr("Scheduler Overhead"));
     Rect* overheadLegend = new Rect(this, Qt::red, 15);
-    QLabel* IO = new QLabel(tr("IO"));
+    QLabel* IO = new QLabel(tr("Loading Pages"));
     Rect* IOLegend = new Rect(this, Qt::blue, 15);
+    QLabel* postDeadlineExecution = new QLabel(tr("Post Deadline Execution"));
+    Rect* postDeadlineExecutionLegend = new Rect(this, Qt::darkBlue, 15);
 
     m_legendLayout->addWidget(running, 0, Qt::AlignCenter);
     m_legendLayout->addWidget(runningLegend);
@@ -372,6 +350,8 @@ void VisualizationWindow::CreateLegend()
     m_legendLayout->addWidget(overheadLegend);
     m_legendLayout->addWidget(IO, 0, Qt::AlignCenter);
     m_legendLayout->addWidget(IOLegend);
+    m_legendLayout->addWidget(postDeadlineExecution, 0, Qt::AlignCenter);
+    m_legendLayout->addWidget(postDeadlineExecutionLegend);
 
     m_legendBox->setLayout(m_legendLayout);
     m_legendBox->setMaximumHeight(100);

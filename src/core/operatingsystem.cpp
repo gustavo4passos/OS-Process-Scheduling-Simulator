@@ -79,7 +79,14 @@ float OperatingSystem::GetAverageTurnaround() const
     return (float)totalExecutionTime / numberOfFinishedProccessses;
 }
 
+int OperatingSystem::WhichProccessOwnsThisPage(unsigned page) const
+{
+    #ifdef M_DEBUG
+    assert(page < m_pageMap.size());
+    #endif
 
+    return m_pageMap[page];
+}
 
 void OperatingSystem::AddProccess(
     int id, 
@@ -94,6 +101,9 @@ void OperatingSystem::AddProccess(
     // Set ID, so proccesses IDs have no gaps
     m_proccesses.back()->SetID(m_proccesses.size());
     m_numberOfProccesses++;
+
+    // Resize the page map to accomodate the new proccess
+    m_pageMap.resize( m_pageMap.size() + numberOfPages);
 }
 
 bool OperatingSystem::NextStep()
@@ -175,6 +185,12 @@ void OperatingSystem::UpdateExecutionQueue()
             std::vector<unsigned> reservedPages = 
                 m_memoryManager->ReserveVirtualPages(
                     (*proccess)->GetNumberOfPages());
+
+            // Map the pages to the new project in page map
+            for(auto& page : reservedPages)
+            {
+                m_pageMap[page] = (*proccess)->GetID();
+            }
 
             (*proccess)->SetPages(reservedPages);
             

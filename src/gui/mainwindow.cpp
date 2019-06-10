@@ -220,7 +220,9 @@ void MainWindow::CreatePRASelectionBox()
     m_PRASelectorBox = new QGroupBox(tr("Page Replacement Algorithm"), this);
 
     QRadioButton* fifoButton = new QRadioButton(tr("FIFO"));
+    fifoButton->setStatusTip(tr("Use the First In First Out Page Replacement Algorithm"));
     QRadioButton* lruButton = new QRadioButton(tr("LRU"));
+    lruButton->setStatusTip(tr("Use the Least Recently Used Page Replacement Algorithm"));
 
     QHBoxLayout* layout = new QHBoxLayout(m_PRASelectorBox);
     layout->addWidget(fifoButton);
@@ -300,34 +302,6 @@ void MainWindow::RunSimulation()
 {
 
     std::vector<ProccessTemplate> proccesses = m_proccessList->GetCurrentProccesses();
-    
-#if FALSE
-    OperatingSystem os = OperatingSystem(m_quantumValueSelector->value(),
-                                         m_overheadValueSelector->value(),
-                                         GetSchedulingAlgorithm());
-    for(auto pTemplate = proccesses.begin();
-        pTemplate != proccesses.end();
-        pTemplate++)
-    {
-        os.AddProccess(
-            pTemplate->ID, 
-            pTemplate->arrivalTime, 
-            pTemplate->duration, 
-            pTemplate->deadline);
-    }
-
-    // Run all steps
-    while(os.NextStep());
-
-    float averageTurnaround = os.GetAverageTurnaround();
-    unsigned executionTime = os.GetExecutionTime();
-
-    QMessageBox::information(this, tr("Simulation Result"),
-        tr("Execution time: %1 t.u.\nAverage turnaround: %2 t.u.").arg(
-            executionTime).arg(averageTurnaround),
-            QMessageBox::StandardButton::Ok);
-
-#endif
 
     if(m_visualizationWindow != nullptr)
     {
@@ -340,8 +314,8 @@ void MainWindow::RunSimulation()
         m_overheadValueSelector->value(),
         GetSchedulingAlgorithm(),
         GetPageReplacementAlgorithm(),
-        proccesses,
-        this);
+        proccesses);
+
     m_visualizationWindow->show();
 }
 

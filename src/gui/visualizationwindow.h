@@ -20,6 +20,8 @@ public:
     );
     ~VisualizationWindow();
 
+    void paintEvent(QPaintEvent*);
+
 public slots:
     void RunStep();
     void PlayPause();
@@ -51,6 +53,8 @@ private:
     QPushButton* m_resetButton;
 
     QWidget* m_leftsideWidget;
+
+    QFrame* m_timelineFrame;
     QVBoxLayout* m_leftsideLayout;
     QTableWidget* m_timeline;
 

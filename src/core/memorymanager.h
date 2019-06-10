@@ -42,7 +42,7 @@ public:
     { 
         return m_pageReplacementAlgorithm; 
     }
-    
+
     const std::vector<int>& GetRAM() const { return RAM; }
 
     // Increase counter by 1

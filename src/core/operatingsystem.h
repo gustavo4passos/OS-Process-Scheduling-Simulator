@@ -32,6 +32,10 @@ public:
     const std::vector<Proccess*>& GetActiveProccesses()   const { return m_executionQueue;     }
     const std::vector<Proccess*>& GetBlockedProcesses() const { return m_blockedProcesses; }
 
+    // Returns the PID of the proccess that owns this page,
+    // or -1 if it doesn't belong to any process
+    int WhichProccessOwnsThisPage(unsigned page) const;
+
     // Add a proccess to the proccess list.
     void AddProccess(
         int id, 
@@ -71,6 +75,8 @@ private:
     // Add arriving proccess to the execution queue
     void UpdateExecutionQueue();
 
+    // Maps a virtual page to a process
+    std::vector<unsigned> m_pageMap;
 };
 
 #endif

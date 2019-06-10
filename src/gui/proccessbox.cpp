@@ -39,7 +39,7 @@ void ProccessBox::CreateSpinBoxes()
     m_arrivalTimeInput->setMaximum(99999);
     m_arrivalTimeInput->setStatusTip(tr("Set the arrival time of the proccess."));
 
-    m_durationLabel = new QLabel(tr("Duration"), this);
+    m_durationLabel = new QLabel(tr("Exec. Time"), this);
     m_durationInput = new QSpinBox(this);
     m_durationInput->setMinimum(1);
     m_durationInput->setMaximum(99999);

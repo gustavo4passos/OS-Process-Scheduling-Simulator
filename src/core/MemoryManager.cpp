@@ -2,8 +2,6 @@
 #include <algorithm>
 #include <assert.h>
 
-#define M_DEBUG
-
 MemoryManager::MemoryManager(
     PageReplacementAlgorithm algorithm)
 :   m_nextAvailableVirtualPage(0),
@@ -32,7 +30,7 @@ bool MemoryManager::AreAllPagesInMemory(
 
     return true;
 }
-#include <iostream>
+
 int MemoryManager::LoadAbsentPagesToMemory(
     const std::vector<unsigned>& pages)
 {
@@ -77,11 +75,6 @@ int MemoryManager::LoadAbsentPagesToMemory(
         }
 
         #ifdef M_DEBUG
-        if(m_freeRamPages.empty())
-        {
-            std::cout << "Time: " << m_counter << " freePage " << freePage << std::endl;
-            std::cout << "Least recently used " << leastRecentlyUsedPage << std::endl;
-        }
         assert(!m_freeRamPages.empty());
         #endif
         
@@ -252,14 +245,13 @@ int MemoryManager::GetOldestPage()
     return oldestPage;
 }
 
-#include <iostream>
 int MemoryManager::GetLeastRecentlyUsedPage()
 {
 
     int oldestPage = -1;
 
     // Find the first present page
-    for(int i = 0; i < m_pageTable.size(); i++)
+    for(unsigned i = 0; i < m_pageTable.size(); i++)
     {
         if(m_pageTable[i].present)
         {
@@ -273,7 +265,7 @@ int MemoryManager::GetLeastRecentlyUsedPage()
     assert(oldestPage != -1);
     #endif
    
-    for(int i = 0; i < m_pageTable.size(); i++)
+    for(unsigned i = 0; i < m_pageTable.size(); i++)
     {
      
         if(m_pageTable[i].lastReferenceTime < m_pageTable[oldestPage].lastReferenceTime &&
