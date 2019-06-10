@@ -370,6 +370,6 @@ void VisualizationWindow::CreateMainLayout()
 void VisualizationWindow::ConnectWidgets()
 {
     connect(m_playTimer, &QTimer::timeout, this, &VisualizationWindow::RunStep);
-    connect(m_playPauseButton, QPushButton::clicked, this, &VisualizationWindow::PlayPause);
-    connect(m_nextStepButton, QPushButton::clicked, this, &VisualizationWindow::NextStep);
+    connect(m_playPauseButton, &QPushButton::clicked, this, &VisualizationWindow::PlayPause);
+    connect(m_nextStepButton, &QPushButton::clicked, this, &VisualizationWindow::NextStep);
 }
