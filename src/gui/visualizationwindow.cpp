@@ -176,6 +176,7 @@ void VisualizationWindow::NextStep()
 {
     if(!m_isPlaying) RunStep();
 }
+
 void VisualizationWindow::CreateTimeline()
 {
     if(m_timeline != nullptr) delete m_timeline;
@@ -200,7 +201,7 @@ void VisualizationWindow::CreateTimeline()
     m_RAMView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_RAMView->setFocusPolicy(Qt::NoFocus);
     m_RAMView->setSelectionMode(QAbstractItemView::NoSelection);
-    m_RAMView->setMaximumWidth(150);
+    m_RAMView->setMaximumWidth(180);
     m_RAMView->setHorizontalHeaderLabels(QStringList() << "RAM/ Owner");
 
     for(int i = 0; i < m_timeline->columnCount(); i++)

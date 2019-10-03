@@ -174,6 +174,7 @@ void MemoryManager::DeletePage(unsigned page)
     assert((unsigned)page < m_pageTable.size());
     #endif
 
+
     m_pageTable[page].protection = false;
 
     if(m_pageTable[page].present)

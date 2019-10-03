@@ -74,6 +74,7 @@ private:
 
     static constexpr unsigned PAGES_LOADED_PER_TICK = 5;
     unsigned m_counter;
+
 };
 
 #endif 
