@@ -78,4 +78,5 @@ private:
     unsigned m_time;
     bool m_isPlaying;
     const unsigned m_stepDelayMs = 5000;
+    const int TIMELINECOLUMNWIDTH = 20;
 };

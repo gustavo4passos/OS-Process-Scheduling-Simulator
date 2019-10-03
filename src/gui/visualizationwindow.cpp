@@ -73,7 +73,7 @@ void VisualizationWindow::RunStep()
             for(int i = 0; i < columnCount; i++)
             {
                 m_timeline->insertColumn(m_timeline->columnCount());
-                m_timeline->setColumnWidth(columnCount + i, 2);
+                m_timeline->setColumnWidth(columnCount + i, TIMELINECOLUMNWIDTH);
             }
         }
 
@@ -104,12 +104,6 @@ void VisualizationWindow::RunStep()
                 m_timeline->setItem(proccesses[i]->GetID() - 1, m_time, newItem);
                 m_timeline->scrollToItem(newItem);
             }
-            // else if(proccesses[i]->GetState() == ProccessState::BLOCKED)
-            // {
-            //     QTableWidgetItem* newItem = new QTableWidgetItem();
-            //     newItem->setBackgroundColor(Qt::black);
-            //     m_timeline->setItem(proccesses[i]->GetID() - 1, time, newItem);
-            // }
             else if(proccesses[i]->GetState() == ProccessState::IO)
             {
                 QTableWidgetItem* newItem = new QTableWidgetItem();
@@ -182,6 +176,7 @@ void VisualizationWindow::NextStep()
 {
     if(!m_isPlaying) RunStep();
 }
+
 void VisualizationWindow::CreateTimeline()
 {
     if(m_timeline != nullptr) delete m_timeline;
@@ -206,12 +201,12 @@ void VisualizationWindow::CreateTimeline()
     m_RAMView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_RAMView->setFocusPolicy(Qt::NoFocus);
     m_RAMView->setSelectionMode(QAbstractItemView::NoSelection);
-    m_RAMView->setMaximumWidth(150);
+    m_RAMView->setMaximumWidth(180);
     m_RAMView->setHorizontalHeaderLabels(QStringList() << "RAM/ Owner");
 
     for(int i = 0; i < m_timeline->columnCount(); i++)
     {
-        m_timeline->setColumnWidth(i, 2);
+        m_timeline->setColumnWidth(i, TIMELINECOLUMNWIDTH);
     }
 
    
@@ -370,6 +365,6 @@ void VisualizationWindow::CreateMainLayout()
 void VisualizationWindow::ConnectWidgets()
 {
     connect(m_playTimer, &QTimer::timeout, this, &VisualizationWindow::RunStep);
-    connect(m_playPauseButton, QPushButton::clicked, this, &VisualizationWindow::PlayPause);
-    connect(m_nextStepButton, QPushButton::clicked, this, &VisualizationWindow::NextStep);
+    connect(m_playPauseButton, &QPushButton::clicked, this, &VisualizationWindow::PlayPause);
+    connect(m_nextStepButton, &QPushButton::clicked, this, &VisualizationWindow::NextStep);
 }
